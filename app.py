@@ -44,8 +44,14 @@ def view_index():
         """
         cursor.execute(q)
         items = cursor.fetchall()
+
+        images = []
+        if items:
+            q_images = "SELECT * FROM images WHERE image_item_fk = %s"
+            cursor.execute(q_images, (items[0]["item_pk"],))
+            images = cursor.fetchall()
         
-        return render_template("view_index.html", title="Skatespots CPH", items=items)
+        return render_template("view_index.html", title="Skatespots CPH", items=items, images=images)
 
     except Exception as ex:
         ic(ex)
