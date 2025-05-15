@@ -1,13 +1,14 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect, url_for
 from flask_session import Session
 import x
+from werkzeug.security import generate_password_hash, check_password_hash
 import time
 import uuid
 import os
 import json
 
 from icecream import ic
-ic.configureOutput(prefix=f'!x!x!x! | ', includeContext=True)
+ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -158,6 +159,123 @@ def get_items_by_page(page_number):
             </mixhtml>
         """
 
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+##############################
+@app.get("/signup")
+def show_signup():
+        active_signup = "active"
+        error_message = request.args.get("error_message", "")
+        return render_template("signup.html", title="signup", active_signup=active_signup, error_message=error_message, old_values={})
+
+##############################
+@app.post("/signup")        
+def signup():
+    try:
+        # vi validere username med funktion fra x filen som indeholder regex.
+        user_username = x.validate_user_username()
+        user_name = x.validate_user_name()
+        user_last_name = x.validate_user_last_name()
+        user_email = x.validate_user_email()
+        user_password = x.validate_user_password()
+        hashed_password = generate_password_hash(user_password)
+        # ic(hashed_password)
+        user_created_at = int(time.time())
+        verification_key = str(uuid.uuid4())
+
+        # query der sender form dataen til databasen. user_pk er null da den auto oprettes i databasen.
+        # i python bruges """ til at lave multi line strings
+        q = """INSERT INTO users 
+        (user_pk, user_username, user_name, user_last_name, user_email, 
+        user_password, user_created_at, user_updated_at, user_deleted_at, user_verified, user_verification_key) 
+        VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        
+        db, cursor = x.db()
+        cursor.execute(q, (user_username, user_name, user_last_name, user_email, hashed_password, user_created_at, 0, 0, 0, verification_key))
+
+        # Denne linje tjekker om præcis en række er oprettet. Hvis 0 rækker oprettes, fx fordi email allerede eksistere i databasen og INSERT afvises, vises fejlbeskeden
+        if cursor.rowcount != 1: 
+            raise Exception("System under maintenance")
+        
+        db.commit()
+        x.send_email(user_name, user_last_name, user_email, verification_key)
+        # hvis alt er korrekt - redirectes til login siden.
+        return redirect(url_for("show_login", message="Thank you for signing up. A verification email has been sent to your inbox. Please click the link in the email to verify your account before logging in."))
+    except Exception as ex:
+        ic(ex)
+
+        # Locals er et indbygget python dictionary, som indeholder alle variabler der er lavet i det lokale scope (i signup funktionen).
+        # Locals = "Vis mig alle variabler, vi har lavet i denne funktion lige nu."
+        # Så hvis brugeren sender forkert data så laves database forbindelsen ikke, og db vil ikke være en del af dictionaryiet.
+        # Men hvis brugeren sender korrekt data og vi når at lave db forbindelsen, så findes db i dictionariet og hvis der går noget galt laver vi et rollback
+        # Så det er bare en sikkerhedsforanstaltning, der laver en rollback hvis der opstår en fejl i transaktionen
+        # Så det er basically for at lave et rollback, hvis der sker en fejl som fx: serveren mister forbindelsen mid i signup eller hvis databasen er løbet tør for plads
+        if "db" in locals():
+            db.rollback()
+
+        # Tag alle input-felter, som brugeren har sendt med formen, og lav dem om til et dictionary, som gemmes i old_values variablen.
+        # Senere i koden indsættes disse værdier så igen i de inputs hvor der ikke var fejl, så brugeren ikke skal skrive dem igen.
+        old_values = request.form.to_dict()
+        # ex er fejlbeskeden, og vi laver fejlbeskeden om til string og tjekker om "username" er i stringen, for at kunne afgøre om det var her fejlen skete.
+        if "username" in str(ex):
+            # Hvis det var i username feltet at fejlen skete, bruger vi pop til at fjerne det brugeren har indtastet, så dette felt bliver tomt og de kan prøve igen
+            old_values.pop("user_username", None)
+            # Hvis fejlen skete her, rendere siden igen, fejlbeskeden vises og old values indsættes i de felter hvor der ikke var fejl.
+            return render_template("signup.html",                                   
+                error_message="Invalid username", old_values=old_values, user_username_error="input_error")
+        if "first name" in str(ex):
+            old_values.pop("user_name", None)
+            return render_template("signup.html",
+                error_message="Invalid name", old_values=old_values, user_name_error="input_error")
+        if "last name" in str(ex):
+            old_values.pop("user_last_name", None)
+            return render_template("signup.html",
+                error_message="Invalid last name", old_values=old_values, user_last_name_error="input_error")
+        if "Invalid email" in str(ex):
+            old_values.pop("user_email", None)
+            return render_template("signup.html",
+                error_message="Invalid email", old_values=old_values, user_email_error="input_error")
+        if "password" in str(ex):
+            old_values.pop("user_password", None)
+            return render_template("signup.html",
+                error_message="Invalid password", old_values=old_values, user_password_error="input_error")
+
+        if "user_email" in str(ex):
+            return redirect(url_for("show_signup",
+                error_message="Email already exists", old_values=old_values, email_error=True))
+        if "user_username" in str(ex): 
+            return redirect(url_for("show_signup", 
+                error_message="Username already exists", old_values=request.form, user_username_error=True))
+        return redirect(url_for("show_signup", error_message=ex.args[0]))
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+@app.get("/verify/<verification_key>")
+def verify_user(verification_key):
+    try:
+        db, cursor = x.db()
+
+        # Tjek om en bruger med denne nøgle findes og ikke allerede er verificeret
+        q = "SELECT * FROM users WHERE user_verification_key = %s AND user_verified = 0"
+        cursor.execute(q, (verification_key,))
+        user = cursor.fetchone()
+
+        if not user:
+            return "Verification key is invalid or already in use", 400
+
+        # Opdater brugeren til at være verificeret og slet nøglen
+        q = "UPDATE users SET user_verified = 1, user_verification_key = NULL WHERE user_verification_key = %s"
+        cursor.execute(q, (verification_key,))
+        db.commit()
+
+        return render_template("login.html", message="Your email is now verified. You can log in.")
+    except Exception as ex:
+        return str(ex), 500
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
