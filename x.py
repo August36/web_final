@@ -30,24 +30,81 @@ def db():
     return db, cursor
 
 ##############################
-# Item validation
+#Upload validation
+ITEM_NAME_REGEX = r"^[a-zA-Z0-9æøåÆØÅ\s.,'\"()\-!?]+$"
+ITEM_DESCRIPTION_REGEX = r"^[a-zA-Z0-9æøåÆØÅ\s.,'\"()\-!?]+$"
+ITEM_ADDRESS_REGEX = r"^[\w\s.,'°\-#æøåÆØÅéÉäÄöÖëËèÈêÊôÔüÜ]+$"
+ITEM_PRICE_REGEX = r"^\d{1,6}(\.\d{1,2})?$"
+ITEM_LAT_REGEX = r"^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$"
+ITEM_LON_REGEX = r"^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
+
+def validate_item_name():
+    name = request.form.get("item_name", "").strip()
+    if len(name) < 2 or len(name) > 60:
+        raise Exception("company_ex name must be between 2 and 60 characters")
+    if not re.match(ITEM_NAME_REGEX, name):
+        raise Exception("company_ex name contains invalid characters")
+    return name
+
+
+def validate_item_description():
+    description = request.form.get("item_description", "").strip()
+    if len(description) < 5 or len(description) > 400:
+        raise Exception("company_ex description must be between 5 and 400 characters")
+    if not re.match(ITEM_DESCRIPTION_REGEX, description):
+        raise Exception("company_ex description contains invalid characters")
+    return description
+
+
+def validate_item_address():
+    address = request.form.get("item_address", "").strip()
+    if len(address) < 5 or len(address) > 100:
+        raise Exception("company_ex address must be between 5 and 100 characters")
+    if not re.match(ITEM_ADDRESS_REGEX, address):
+        raise Exception("company_ex address contains invalid characters")
+    return address
+
+
+def validate_item_price():
+    price = request.form.get("item_price", "").strip()
+    if not re.match(ITEM_PRICE_REGEX, price):
+        raise Exception("company_ex price must be a number with up to 2 decimals")
+    return float(price)
+
+
+def validate_item_lat():
+    lat = request.form.get("item_lat", "").strip()
+    if not re.match(ITEM_LAT_REGEX, lat):
+        raise Exception("company_ex latitude is invalid")
+    return float(lat)
+
+
+def validate_item_lon():
+    lon = request.form.get("item_lon", "").strip()
+    if not re.match(ITEM_LON_REGEX, lon):
+        raise Exception("company_ex longitude is invalid")
+    return float(lon)
+
+
+
+############################## image validation
 ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif"]
 MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB - size in bytes
-MAX_FILES = 5
+MAX_IMAGES_PER_ITEM = 3
 
 def validate_item_images():
     images_names = []
     if "files" not in request.files:
-         raise Exception("company_ex at least one file")
+        raise Exception("company_ex at least one file")
     
     files = request.files.getlist('files')
     
     # TODO: Fix the validation for 0 files
     # if not files == [None]:
     #     raise Exception("company_ex at least one file")  
-       
-    if len(files) > MAX_FILES:
-        raise Exception("company_ex max 5 files")
+
+    if len(files) > MAX_IMAGES_PER_ITEM:
+        raise Exception("company_ex max 3 images per item")
 
     for the_file in files:
         file_size = len(the_file.read()) # size is in bytes                 
@@ -121,6 +178,7 @@ def send_email(user_name, user_last_name, user_email, user_verification_key):
     """
     send_email_template(user_email, "Welcome", html_body)
 
+##############################
 def send_email_template(receiver_email, subject, html_body):
     try:
         message = MIMEMultipart()
@@ -139,3 +197,25 @@ def send_email_template(receiver_email, subject, html_body):
     except Exception as ex:
         ic(ex)
         raise Exception("Could not send email")
+
+##############################
+#Reset password
+def send_reset_email(user_email, reset_key):
+    reset_link = f"http://localhost/reset-password/{reset_key}"
+    html_body = f"""
+    <p>We received a request to reset your password.</p>
+    <p>Click the link below to choose a new one:</p>
+    <p><a href="{reset_link}">{reset_link}</a></p>
+    <p>If you didn't request a password reset, just ignore this email.</p>
+    """
+    send_email_template(user_email, "Reset your password", html_body)
+
+
+##############################
+#Delete account
+def send_delete_confirmation(user_email):
+    html_body = """
+    <p>Your account has been deleted from SkateSpot.</p>
+    <p>We're sorry to see you go!</p>
+    """
+    send_email_template(user_email, "Account deleted", html_body)

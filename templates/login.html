@@ -1,0 +1,25 @@
+{% include "_header.html" %}
+{% include "_nav.html" %}
+
+
+<main id="login">
+
+    <h1>
+        {{ message }}
+    </h1>
+
+    <form action="/login" method="POST">
+        <input name="user_email" type="email" placeholder="user email" required>
+        <input type="password" name="user_password" placeholder="password" required minlength="2" maxlength="20">
+        <button class="mt1">
+            Login
+        </button>
+    </form>
+
+    <p>
+        <a href="{{ url_for('show_forgot_password') }}">Forgot your password?</a>
+      </p>
+
+</main>
+
+{% include "_footer_base.html" %}

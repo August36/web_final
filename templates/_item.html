@@ -1,17 +1,21 @@
 <div id="item">
-    {% for image in images %}
-    <img src="{{ url_for('static', filename='uploads/' + image.image_name) }}" alt="{{ item.item_name }}">
-    {% endfor %}
-    <p>
-        {{ item.item_name }}
-    </p>
-    <p>
-        {{ item.item_description }}
-    </p>
     <div>
-        {{ "{:,}".format(item.item_price)  }} Dkk
+        <p>
+            {{ item.item_name }}
+        </p>
+        <p>
+            {{ item.item_description }}
+        </p>
+        <div>
+            {{ "{:,}".format(item.item_price)  }} Dkk
+        </div>
+        <a href="/items/{{ item.item_pk }}" target="_blank">
+            Open in window
+        </a>
     </div>
-    <a href="/items/{{ item.item_pk }}" target="_blank">
-        Open in window
-    </a>
+    <div id="img-wrapper">
+        {% for image in images %}
+        <img src="{{ url_for('static', filename='uploads/' + image.image_name) }}" alt="{{ item.item_name }}">
+        {% endfor %}
+    </div>
 </div>
