@@ -1,0 +1,21 @@
+<nav>
+    <a href="/">
+        Items
+    </a>
+
+    <div id="search_container">
+        <input id="input_search" oninput="search()" class="" type="text" placeholder="Search">
+        <div id="search_results" class="hidden">
+        </div>
+    </div>
+
+    <div>
+        {% if not g.is_session %}
+            <a class="{{ active_signup }}" href="/signup">Signup</a>
+            <a class="{{ active_login }}" href="/login">Login</a>
+        {% else %}
+            <a href="/profile">Profile</a>
+            <a class="{{ active_login }}" href="/logout">Logout</a>
+        {% endif %}
+    </div>
+</nav>

@@ -1,0 +1,29 @@
+<script src="{{ url_for('static', filename='mixhtml.js') }}"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+<script>
+    //create map, center on copenhagen
+    var map = L.map('map').setView([55.6761, 12.5683], 13)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    {% for item in items: %}
+
+        var customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div mix-get="/items/{{ item.item_pk }}" class="custom-marker">{{ item.item_name[:1] }}</div>`,
+            iconSize: [50, 50],
+            iconAnchor: [25, 25],
+        });
+
+        var marker = L.marker([{{ item.item_lat }}, {{ item.item_lon }}], { icon: customIcon }).addTo(map)
+        .bindPopup("{{ item.item_name }}")
+    {% endfor %}
+
+    mix_convert()
+</script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+<div id="item">
+    {% for image in images %}
+    <img src="{{ url_for('static', filename='uploads/' + image.image_name) }}" alt="{{ item.item_name }}">
+    {% endfor %}
+    <p>
+        {{ item.item_name }}
+    </p>    
+    <div>
+        {{ "{:,}".format(item.item_price)  }} Dkk
+    </div>
+    <a href="/items/{{ item.item_pk }}" target="_blank">
+        Open in window
+    </a>
+</div>

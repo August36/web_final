@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+
+# Flask sessions
+flask_session/
+
+# Database-backups og scripts
+*.sql
+
+# Node modules / hvis du bruger npm til frontend
+node_modules/
+
+# Docker (valgfrit)
+*.log
+*.pid
+
+# Systemfiler
+.DS_Store
+Thumbs.db
+
+# IDE/editor filer
+.vscode/
+.idea/
+
+*todo.txt
+
+venv/
+.env
+
+understanding.js

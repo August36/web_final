@@ -1,0 +1,33 @@
+# Python cache og bytecode
+__pycache__/
+*.pyc
+
+# Virtuelle miljøer
+venv/
+.venv/
+
+# Git-filer
+.git/
+.gitignore
+
+# Miljøvariabler
+.env
+*.env
+
+# Database-dumps eller scripts
+*.sql
+
+# Editor- og IDE-konfigurationer
+.vscode/
+.idea/
+
+# Logs og runtime-filer
+*.log
+*.pid
+
+# Mac/Windows systemfiler
+.DS_Store
+Thumbs.db
+
+# Midlertidige noter (valgfrit – fjern denne hvis du vil gemme den i Docker)
+todo.txt
