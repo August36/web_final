@@ -512,22 +512,25 @@ def logout():
 def view_admin():
     try:
         if not session.get("user") or not session["user"].get("user_is_admin"):
-            return render_template("login.html", message="You most be an admin to access this page.")
+            return render_template("login.html", message="You must be an admin.")
 
         db, cursor = x.db()
-        q = "SELECT * FROM users"
-        cursor.execute(q)
+
+        cursor.execute("SELECT * FROM users")
         users = cursor.fetchall()
 
-        return render_template("view_admin.html", users=users)
+        cursor.execute("SELECT * FROM items")
+        items = cursor.fetchall()
+
+        return render_template("view_admin.html", users=users, items=items)
 
     except Exception as ex:
         ic(ex)
         return str(ex)
-    
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 #Block user med form
@@ -541,19 +544,30 @@ def admin_block_user():
         cursor.execute(q, (int(time.time()), user_pk))
         db.commit()
 
-        # Send e-mail til brugeren (tilføj din rigtige funktion her)
-        # x.send_block_email(user_pk)
-
-        # Generér unblock-formular
+        # Ny unblock-form med wrapper
         button = f"""
-        <form mix-patch="/admin/unblock-user" method="post">
-            <input type="hidden" name="user_pk" value="{user_pk}">
-            <button class="btn unblock">Unblock</button>
-        </form>
+        <div id="user-actions-{user_pk}">
+            <form mix-patch="/admin/unblock-user" method="post">
+                <input type="hidden" name="user_pk" value="{user_pk}">
+                <button class="btn unblock">Unblock</button>
+            </form>
+        </div>
         """
+
+        # Besked
+        message = f"""
+        <div class='alert success' mix-ttl="3000">
+            ✅ User #{user_pk} has been blocked.
+        </div>
+        """
+
         return f"""
-        <mixhtml mix-replace="form[action='/admin/block-user'] input[value='{user_pk}'] ~ button">
+        <mixhtml mix-replace="#user-actions-{user_pk}">
             {button}
+        </mixhtml>
+
+        <mixhtml mix-update="#user-card-{user_pk} .user-feedback">
+            {message}
         </mixhtml>
         """
 
@@ -563,6 +577,8 @@ def admin_block_user():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+
 
 ##############################
 #Unblock user
@@ -576,19 +592,29 @@ def admin_unblock_user():
         cursor.execute(q, (user_pk,))
         db.commit()
 
-        # Send e-mail til brugeren (tilføj din rigtige funktion her)
-        # x.send_unblock_email(user_pk)
-
-        # Generér block-formular
+        # Ny block-form med wrapper
         button = f"""
-        <form mix-patch="/admin/block-user" method="post">
-            <input type="hidden" name="user_pk" value="{user_pk}">
-            <button class="btn block">Block</button>
-        </form>
+        <div id="user-actions-{user_pk}">
+            <form mix-patch="/admin/block-user" method="post">
+                <input type="hidden" name="user_pk" value="{user_pk}">
+                <button class="btn block">Block</button>
+            </form>
+        </div>
         """
+
+        message = f"""
+        <div class='alert success' mix-ttl="3000">
+            ✅ User #{user_pk} has been unblocked.
+        </div>
+        """
+
         return f"""
-        <mixhtml mix-replace="form[action='/admin/unblock-user'] input[value='{user_pk}'] ~ button">
+        <mixhtml mix-replace="#user-actions-{user_pk}">
             {button}
+        </mixhtml>
+
+        <mixhtml mix-update="#user-card-{user_pk} .user-feedback">
+            {message}
         </mixhtml>
         """
 
@@ -598,6 +624,95 @@ def admin_unblock_user():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+##############################
+#Block item
+@app.patch("/admin/block-item")
+def admin_block_item():
+    try:
+        item_pk = request.form.get("item_pk")
+
+        db, cursor = x.db()
+        cursor.execute("UPDATE items SET item_blocked_at = %s WHERE item_pk = %s", (int(time.time()), item_pk))
+        db.commit()
+
+        button = f"""
+        <div id="item-actions-{item_pk}">
+            <form mix-patch="/admin/unblock-item" method="post">
+                <input type="hidden" name="item_pk" value="{item_pk}">
+                <button class="btn unblock">Unblock</button>
+            </form>
+            <div class="item-feedback"></div>
+        </div>
+        """
+
+        message = f"""
+        <div class='alert success' mix-ttl="3000">
+            ✅ Item #{item_pk} has been blocked.
+        </div>
+        """
+
+        return f"""
+        <mixhtml mix-replace="#item-actions-{item_pk}">
+            {button}
+        </mixhtml>
+        <mixhtml mix-update="#item-actions-{item_pk} .item-feedback">
+            {message}
+        </mixhtml>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex), 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+#Unblock item
+@app.patch("/admin/unblock-item")
+def admin_unblock_item():
+    try:
+        item_pk = request.form.get("item_pk")
+
+        db, cursor = x.db()
+        cursor.execute("UPDATE items SET item_blocked_at = 0 WHERE item_pk = %s", (item_pk,))
+        db.commit()
+
+        button = f"""
+        <div id="item-actions-{item_pk}">
+            <form mix-patch="/admin/block-item" method="post">
+                <input type="hidden" name="item_pk" value="{item_pk}">
+                <button class="btn block">Block</button>
+            </form>
+            <div class="item-feedback"></div>
+        </div>
+        """
+
+        message = f"""
+        <div class='alert success' mix-ttl="3000">
+            ✅ Item #{item_pk} has been unblocked.
+        </div>
+        """
+
+        return f"""
+        <mixhtml mix-replace="#item-actions-{item_pk}">
+            {button}
+        </mixhtml>
+        <mixhtml mix-update="#item-actions-{item_pk} .item-feedback">
+            {message}
+        </mixhtml>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex), 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+
 
 ##############################
 @app.get("/forgot-password")

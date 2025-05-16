@@ -5,31 +5,63 @@
         <h2>Users</h2>
         <div class="user-list">
             {% for user in users %}
-                <div class="user-card">
+                <div class="user-card" id="user-card-{{ user.user_pk }}">
                     <p><strong>ID:</strong> {{ user.user_pk }}</p>
                     <p><strong>Name:</strong> {{ user.user_username }}</p>
                     <p><strong>Email:</strong> {{ user.user_email }}</p>
                     <p><strong>Admin:</strong> {{ "Yes" if user.user_is_admin else "No" }}</p>
                     <p><strong>Blocked:</strong> {{ "Yes" if user.user_blocked_at != 0 else "No" }}</p>
+                    <div class="user-feedback"></div>
+
 
                    <!-- # Bruger form til mix-patch, i stedet for buttons(som i undervisningskoden), for at kunne sende user_pk sikkert som et hidden input,
                     og for nemmere at kunne udvide senere, hvis nødvendigt. # -->
 
-                    {% if user.user_blocked_at == 0 %}
-                        <form mix-patch="/admin/block-user" method="post" autocomplete="off">
-                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
-                            <button class="btn block">Block</button>
-                        </form>
-                    {% else %}
-                        <form mix-patch="/admin/unblock-user" method="post" autocomplete="off">
-                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
-                            <button class="btn unblock">Unblock</button>
-                        </form>
-                    {% endif %}
+                    <div id="user-actions-{{ user.user_pk }}">
+                        {% if user.user_blocked_at == 0 %}
+                            <form mix-patch="/admin/block-user" method="post">
+                                <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
+                                <button class="btn block">Block</button>
+                            </form>
+                        {% else %}
+                            <form mix-patch="/admin/unblock-user" method="post">
+                                <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
+                                <button class="btn unblock">Unblock</button>
+                            </form>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         </div>
     </section>
+
+    <section id="items">
+    <h2>Items</h2>
+    {% for item in items %}
+        <div class="item-card" id="item-card-{{ item.item_pk }}">
+            <p><strong>ID:</strong> {{ item.item_pk }}</p>
+            <p><strong>Name:</strong> {{ item.item_name }}</p>
+            <p><strong>User FK:</strong> {{ item.item_user_fk }}</p>
+            <p><strong>Blocked:</strong> {{ "Yes" if item.item_blocked_at != 0 else "No" }}</p>
+
+            <div id="item-actions-{{ item.item_pk }}">
+                {% if item.item_blocked_at == 0 %}
+                    <form mix-patch="/admin/block-item" method="post">
+                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
+                        <button class="btn block">Block</button>
+                    </form>
+                {% else %}
+                    <form mix-patch="/admin/unblock-item" method="post">
+                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
+                        <button class="btn unblock">Unblock</button>
+                    </form>
+                {% endif %}
+                <div class="item-feedback"></div>
+            </div>
+        </div>
+    {% endfor %}
+</section>
+
 </main>
 
 {% include "_footer_base.html" %}
