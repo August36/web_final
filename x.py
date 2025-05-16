@@ -168,6 +168,12 @@ def validate_user_password():
     return value
 
 ##############################
+#search validation
+def validate_search_query(q):
+    if len(q) > 50: raise Exception("Query too long")
+    return q.strip()
+
+##############################
 #Verification mails
 
 def send_email(user_name, user_last_name, user_email, user_verification_key):

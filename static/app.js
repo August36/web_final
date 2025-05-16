@@ -1,43 +1,58 @@
-const search_results = document.querySelector("#search_results")
-const input_search = document.querySelector("#input_search")
-let my_timer = null
+const search_results = document.querySelector("#search_results");
+const input_search = document.querySelector("#input_search");
+let my_timer = null;
 
-function search(){
-    clearInterval(my_timer)
-    if (input_search.value != ""){
-        my_timer = setTimeout( async function() {
-            try{
-                const search_for = input_search.value
-                const conn = await fetch(`/search?q=${search_for}`)
-                const data = await conn.json()
-                search_results.innerHTML = ""
-                console.log(data)
+function search() {
+    clearInterval(my_timer);
+    if (input_search.value.trim() !== "") {
+        my_timer = setTimeout(async function () {
+            try {
+                const search_for = input_search.value.trim();
+                const conn = await fetch(`/search?q=${search_for}`);
+                const data = await conn.json();
+
+                search_results.innerHTML = "";
+
+                if (data.length === 0) {
+                    search_results.classList.add("hidden");
+                    return;
+                }
+
                 data.forEach(item => {
-                    const a = `<div>
-                                <img src ="/static/images/${item.item_image}">
-                                <a href="/${item.item_name}">${item.item_name}</a>
-                                </div>`
-                    search_results.insertAdjacentHTML("beforeend", a)           
-                })
-                search_results.classList.remove("hidden")
-            }catch(err){
-                console.error(err)
+                    const html = `
+                        <div mix-get="/items/${item.item_pk}" class="search-result">
+                            <img src="/static/uploads/${item.item_image}" alt="">
+                            <span>${item.item_name}</span>
+                        </div>
+                    `;
+                    search_results.insertAdjacentHTML("beforeend", html);
+                });
+
+                mix_convert();
+
+                search_results.classList.remove("hidden");
+
+            } catch (err) {
+                console.error(err);
+                search_results.classList.add("hidden");
             }
-        }, 500 )
-    }else{
-        search_results.innerHTML = ""
-        search_results.classList.add("hidden")
+        }, 500);
+    } else {
+        search_results.innerHTML = "";
+        search_results.classList.add("hidden");
     }
 }
 
-addEventListener("click", function(event){
-    if( ! search_results.contains(event.target) ){
-        search_results.classList.add("hidden")
+
+addEventListener("click", function (event) {
+    if (!search_results.contains(event.target)) {
+        search_results.classList.add("hidden");
     }
-    if( input_search.contains(event.target) ){
-        search_results.classList.remove("hidden")
+    if (input_search.contains(event.target)) {
+        search_results.classList.remove("hidden");
     }
-})
+});
+
 
 function add_markers_to_map(data){
     console.log(data)

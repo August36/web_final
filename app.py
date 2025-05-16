@@ -1,4 +1,4 @@
-from flask import Flask, g, render_template, session, request, redirect, url_for
+from flask import Flask, g, render_template, session, request, redirect, url_for, jsonify
 from flask_session import Session
 import x
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -747,3 +747,28 @@ def confirm_delete_profile():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+##############################
+#search
+@app.get("/search")
+def search():
+    try:
+        search_for = request.args.get("q", "")
+        db, cursor = x.db()
+        q = """
+        SELECT items.*, (
+            SELECT image_name
+            FROM images
+            WHERE images.image_item_fk = items.item_pk
+            ORDER BY image_pk ASC
+            LIMIT 1
+        ) AS item_image
+        FROM items
+        WHERE item_name LIKE %s
+        """
+        cursor.execute(q, (f"{search_for}%",))
+        rows = cursor.fetchall()
+        return jsonify(rows)
+    except Exception as ex:
+        ic(ex)
+        return "x", 400
