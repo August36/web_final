@@ -562,7 +562,10 @@ def admin_block_user():
             ✅ User #{user_pk} has been blocked.
         </div>
         """
-
+        cursor.execute("SELECT user_email, user_name FROM users WHERE user_pk = %s", (user_pk,))
+        user = cursor.fetchone()
+        if user:
+            x.send_block_user_email(user["user_email"], user["user_name"])
         return f"""
         <mixhtml mix-replace="#user-actions-{user_pk}">
             {button}
@@ -609,6 +612,10 @@ def admin_unblock_user():
             ✅ User #{user_pk} has been unblocked.
         </div>
         """
+        cursor.execute("SELECT user_email, user_name FROM users WHERE user_pk = %s", (user_pk,))
+        user = cursor.fetchone()
+        if user:
+            x.send_unblock_user_email(user["user_email"], user["user_name"])
 
         return f"""
         <mixhtml mix-replace="#user-actions-{user_pk}">
@@ -654,6 +661,16 @@ def admin_block_item():
         </div>
         """
 
+        cursor.execute("""
+        SELECT users.user_email, users.user_name, items.item_name
+        FROM items
+        JOIN users ON users.user_pk = items.item_user_fk
+        WHERE items.item_pk = %s
+        """, (item_pk,))
+        data = cursor.fetchone()
+        if data:
+            x.send_block_item_email(data["user_email"], data["user_name"], data["item_name"])
+
         return f"""
         <mixhtml mix-replace="#item-actions-{item_pk}">
             {button}
@@ -696,6 +713,16 @@ def admin_unblock_item():
             ✅ Item #{item_pk} has been unblocked.
         </div>
         """
+        cursor.execute("""
+        SELECT users.user_email, users.user_name, items.item_name
+        FROM items
+        JOIN users ON users.user_pk = items.item_user_fk
+        WHERE items.item_pk = %s
+        """, (item_pk,))
+        data = cursor.fetchone()
+        if data:
+            x.send_unblock_item_email(data["user_email"], data["user_name"], data["item_name"])
+
 
         return f"""
         <mixhtml mix-replace="#item-actions-{item_pk}">
@@ -712,9 +739,6 @@ def admin_unblock_item():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
-
-
 
 ##############################
 @app.get("/forgot-password")

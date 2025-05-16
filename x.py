@@ -85,8 +85,6 @@ def validate_item_lon():
         raise Exception("company_ex longitude is invalid")
     return float(lon)
 
-
-
 ############################## image validation
 ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif"]
 MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB - size in bytes
@@ -174,8 +172,7 @@ def validate_search_query(q):
     return q.strip()
 
 ##############################
-#Verification mails
-
+#Email - Account created
 def send_email(user_name, user_last_name, user_email, user_verification_key):
     verification_link = f"http://localhost/verify/{user_verification_key}"
     html_body = f"""
@@ -205,7 +202,7 @@ def send_email_template(receiver_email, subject, html_body):
         raise Exception("Could not send email")
 
 ##############################
-#Reset password
+#Email - Reset password
 def send_reset_email(user_email, reset_key):
     reset_link = f"http://localhost/reset-password/{reset_key}"
     html_body = f"""
@@ -218,10 +215,51 @@ def send_reset_email(user_email, reset_key):
 
 
 ##############################
-#Delete account
+#Email - Delete account
 def send_delete_confirmation(user_email):
     html_body = """
     <p>Your account has been deleted from SkateSpot.</p>
     <p>We're sorry to see you go!</p>
     """
     send_email_template(user_email, "Account deleted", html_body)
+
+##############################
+#Email - Account blocked
+def send_block_user_email(user_email, user_name):
+    html_body = f"""
+    <p>Hi {user_name},</p>
+    <p>Your account on SkateSpot has been blocked by an administrator. You can no longer log in or interact with the platform.</p>
+    <p>If you believe this was a mistake, please contact support.</p>
+    """
+    send_email_template(user_email, "Your SkateSpot account has been blocked", html_body)
+
+
+##############################
+#Email - Account unblocked
+def send_unblock_user_email(user_email, user_name):
+    html_body = f"""
+    <p>Hi {user_name},</p>
+    <p>Your account on SkateSpot has been unblocked. You can now log in and use the platform again.</p>
+    """
+    send_email_template(user_email, "Your SkateSpot account has been unblocked", html_body)
+
+
+##############################
+#Email - Item blocked
+def send_block_item_email(user_email, user_name, item_name):
+    html_body = f"""
+    <p>Hi {user_name},</p>
+    <p>Your spot <strong>{item_name}</strong> has been blocked by an administrator and is no longer visible.</p>
+    <p>If you believe this was a mistake, please contact support.</p>
+    """
+    send_email_template(user_email, f"Your spot '{item_name}' has been blocked", html_body)
+
+
+##############################
+#Email - Item unblocked
+def send_unblock_item_email(user_email, user_name, item_name):
+    html_body = f"""
+    <p>Hi {user_name},</p>
+    <p>Your spot <strong>{item_name}</strong> has been unblocked and is now visible on the platform again.</p>
+    """
+    send_email_template(user_email, f"Your spot '{item_name}' has been unblocked", html_body)
