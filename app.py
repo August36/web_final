@@ -484,6 +484,8 @@ def login():
         if not user: raise Exception("User not found")
         if not user["user_verified"]:
             return render_template("login.html", title="Login", active_login="active", message="Please verify your email before logging in.")
+        if user["user_blocked_at"] != 0:
+            return render_template("login.html", title="Login", active_login="active", message="Your account is blocked.")
         if not check_password_hash(user["user_password"], user_password):
             raise Exception("Invalid credentials")
         user.pop("user_password")
@@ -502,6 +504,11 @@ def login():
 def logout():
     session.pop("user")
     return redirect(url_for("show_login"))
+
+
+##############################
+#Admin
+
 
 ##############################
 @app.get("/forgot-password")
