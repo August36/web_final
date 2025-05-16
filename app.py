@@ -45,6 +45,7 @@ def view_index():
             LIMIT 1
         ) AS item_image
         FROM items
+        WHERE item_blocked_at = 0
         ORDER BY item_created_at
         LIMIT 2
         """
@@ -74,7 +75,7 @@ def get_item_by_pk(item_pk):
         db, cursor = x.db()
 
         # Hent selve item
-        q_item = "SELECT * FROM items WHERE item_pk = %s"
+        q_item = "SELECT * FROM items WHERE item_pk = %s AND item_blocked_at = 0"
         cursor.execute(q_item, (item_pk,))
         item = cursor.fetchone()
 
@@ -299,6 +300,7 @@ def get_items_by_page(page_number):
             LIMIT 1
         ) AS item_image
         FROM items
+        WHERE item_blocked_at = 0
         ORDER BY item_created_at
         LIMIT %s OFFSET %s
         """
@@ -817,8 +819,7 @@ def profile():
         user = x.validate_user_logged()
         db, cursor = x.db()
 
-        #hent alle items fra brugeren
-        q_items = "SELECT * FROM items WHERE item_user_fk = %s ORDER BY item_created_at DESC"
+        q_items = "SELECT * FROM items WHERE item_user_fk = %s AND item_blocked_at = 0 ORDER BY item_created_at DESC"
         cursor.execute(q_items, (user["user_pk"],))
         items = cursor.fetchall()
 
@@ -975,7 +976,7 @@ def search():
             LIMIT 1
         ) AS item_image
         FROM items
-        WHERE item_name LIKE %s
+        WHERE item_blocked_at = 0 AND item_name LIKE %s
         """
         cursor.execute(q, (f"{search_for}%",))
         rows = cursor.fetchall()
