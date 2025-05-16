@@ -1,0 +1,35 @@
+{% include "_header.html" %}
+{% include "_nav.html" %}
+
+    <section class="admin-users">
+        <h2>Users</h2>
+        <div class="user-list">
+            {% for user in users %}
+                <div class="user-card">
+                    <p><strong>ID:</strong> {{ user.user_pk }}</p>
+                    <p><strong>Name:</strong> {{ user.user_username }}</p>
+                    <p><strong>Email:</strong> {{ user.user_email }}</p>
+                    <p><strong>Admin:</strong> {{ "Yes" if user.user_is_admin else "No" }}</p>
+                    <p><strong>Blocked:</strong> {{ "Yes" if user.user_blocked_at != 0 else "No" }}</p>
+
+                   <!-- # Bruger form til mix-patch, i stedet for buttons(som i undervisningskoden), for at kunne sende user_pk sikkert som et hidden input,
+                    og for nemmere at kunne udvide senere, hvis nødvendigt. # -->
+
+                    {% if user.user_blocked_at == 0 %}
+                        <form mix-patch="/admin/block-user" method="post" autocomplete="off">
+                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
+                            <button class="btn block">Block</button>
+                        </form>
+                    {% else %}
+                        <form mix-patch="/admin/unblock-user" method="post" autocomplete="off">
+                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
+                            <button class="btn unblock">Unblock</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+{% include "_footer_base.html" %}

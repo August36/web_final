@@ -508,7 +508,96 @@ def logout():
 
 ##############################
 #Admin
+@app.get("/admin")
+def view_admin():
+    try:
+        if not session.get("user") or not session["user"].get("user_is_admin"):
+            return render_template("login.html", message="You most be an admin to access this page.")
 
+        db, cursor = x.db()
+        q = "SELECT * FROM users"
+        cursor.execute(q)
+        users = cursor.fetchall()
+
+        return render_template("view_admin.html", users=users)
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex)
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+#Block user med form
+@app.patch("/admin/block-user")
+def admin_block_user():
+    try:
+        user_pk = request.form.get("user_pk")
+
+        db, cursor = x.db()
+        q = "UPDATE users SET user_blocked_at = %s WHERE user_pk = %s"
+        cursor.execute(q, (int(time.time()), user_pk))
+        db.commit()
+
+        # Send e-mail til brugeren (tilføj din rigtige funktion her)
+        # x.send_block_email(user_pk)
+
+        # Generér unblock-formular
+        button = f"""
+        <form mix-patch="/admin/unblock-user" method="post">
+            <input type="hidden" name="user_pk" value="{user_pk}">
+            <button class="btn unblock">Unblock</button>
+        </form>
+        """
+        return f"""
+        <mixhtml mix-replace="form[action='/admin/block-user'] input[value='{user_pk}'] ~ button">
+            {button}
+        </mixhtml>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex), 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+#Unblock user
+@app.patch("/admin/unblock-user")
+def admin_unblock_user():
+    try:
+        user_pk = request.form.get("user_pk")
+
+        db, cursor = x.db()
+        q = "UPDATE users SET user_blocked_at = 0 WHERE user_pk = %s"
+        cursor.execute(q, (user_pk,))
+        db.commit()
+
+        # Send e-mail til brugeren (tilføj din rigtige funktion her)
+        # x.send_unblock_email(user_pk)
+
+        # Generér block-formular
+        button = f"""
+        <form mix-patch="/admin/block-user" method="post">
+            <input type="hidden" name="user_pk" value="{user_pk}">
+            <button class="btn block">Block</button>
+        </form>
+        """
+        return f"""
+        <mixhtml mix-replace="form[action='/admin/unblock-user'] input[value='{user_pk}'] ~ button">
+            {button}
+        </mixhtml>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex), 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
 @app.get("/forgot-password")
