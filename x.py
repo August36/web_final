@@ -86,7 +86,7 @@ def validate_item_lon():
     return float(lon)
 
 ############################## image validation
-ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif"]
+ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "webp"]
 MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB - size in bytes
 MAX_IMAGES_PER_ITEM = 3
 

@@ -183,7 +183,7 @@ def post_item():
 
         item_html = f"""
         <div class="item-card" id="x{item_pk}">
-            <h2>{values['item_name']}</h2>
+            <h3>{values['item_name']}</h3>
             <p><strong>Price:</strong> {values['item_price']} DKK</p>
             <p><strong>Address:</strong> {values['item_address']}</p>
             <p>{values['item_description']}</p>
@@ -238,6 +238,89 @@ def post_item():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals():     db.close()
+
+##############################
+#Edit item
+@app.patch("/items/<item_pk>")
+def edit_item(item_pk):
+    try:
+        user = x.validate_user_logged()
+        validators = [
+            ("item_name",        x.validate_item_name),
+            ("item_description", x.validate_item_description),
+            ("item_price",       x.validate_item_price),
+            ("item_lat",         x.validate_item_lat),
+            ("item_lon",         x.validate_item_lon),
+            ("item_address",     x.validate_item_address),
+        ]
+
+        values, form_errors = {}, {}
+        for field, fn in validators:
+            try:
+                values[field] = fn()
+            except Exception as ex:
+                form_errors[field] = str(ex)
+
+        if form_errors:
+            error_html = (
+                "<ul class='error-list'>"
+                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+                + "</ul>"
+            )
+            return f"""
+            <mixhtml mix-update="#form-errors-{item_pk}">
+                {error_html}
+            </mixhtml>
+            """
+
+        db, cursor = x.db()
+
+        cursor.execute(
+            """
+            UPDATE items
+            SET item_name = %s,
+                item_description = %s,
+                item_price = %s,
+                item_lat = %s,
+                item_lon = %s,
+                item_address = %s,
+                item_updated_at = %s
+            WHERE item_pk = %s AND item_user_fk = %s
+            """,
+            (
+                values["item_name"],
+                values["item_description"],
+                values["item_price"],
+                values["item_lat"],
+                values["item_lon"],
+                values["item_address"],
+                int(time.time()),
+                item_pk,
+                user["user_pk"],
+            ),
+        )
+
+        db.commit()
+
+        message = f"""
+        <div class="alert success" mix-ttl="3000">
+            ✅ Spot updated successfully.
+        </div>
+        """
+        return f"""
+        <mixhtml mix-update="#form-errors-{item_pk}">
+            {message}
+        </mixhtml>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex), 400
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 
 ##############################
 @app.delete("/images/<image_pk>")
