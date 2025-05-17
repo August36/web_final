@@ -9,8 +9,20 @@
     </h1>
 
     <form action="/login" method="POST">
-        <input name="user_email" type="email" placeholder="user email" required>
-        <input type="password" name="user_password" placeholder="password" required minlength="2" maxlength="20">
+          <input 
+            name="user_email" 
+            type="email" 
+            placeholder="user email" 
+            required 
+            title="Enter a valid email address">
+          <input 
+            type="password" 
+            name="user_password" 
+            placeholder="password" 
+            required 
+            minlength="2" 
+            maxlength="20" 
+            title="Password must be 2–20 characters">
         <button class="mt1">
             Login
         </button>

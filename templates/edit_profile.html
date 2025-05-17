@@ -8,21 +8,47 @@
     <p class="info-message">{{ message }}</p>
   {% endif %}
 
-  <form method="POST" action="{{ url_for('update_profile') }}">
-    <input type="text" name="user_username" placeholder="Username"
-           value="{{ old_values.get('user_username', '') }}" required>
+<form method="POST" action="{{ url_for('update_profile') }}">
+  <input 
+    type="text" 
+    name="user_username" 
+    placeholder="Username"
+    value="{{ old_values.get('user_username', '') }}" 
+    required 
+    minlength="2" 
+    maxlength="20"
+    title="Username must be between 2 and 20 characters">
 
-    <input type="text" name="user_name" placeholder="First name"
-           value="{{ old_values.get('user_name', '') }}" required>
+  <input 
+    type="text" 
+    name="user_name" 
+    placeholder="First name"
+    value="{{ old_values.get('user_name', '') }}" 
+    required 
+    minlength="2" 
+    maxlength="20"
+    title="First name must be between 2 and 20 characters">
 
-    <input type="text" name="user_last_name" placeholder="Last name"
-           value="{{ old_values.get('user_last_name', '') }}" required>
+  <input 
+    type="text" 
+    name="user_last_name" 
+    placeholder="Last name"
+    value="{{ old_values.get('user_last_name', '') }}" 
+    required 
+    minlength="2" 
+    maxlength="20"
+    title="Last name must be between 2 and 20 characters">
 
-    <input type="email" name="user_email" placeholder="Email"
-           value="{{ old_values.get('user_email', '') }}" required>
+  <input 
+    type="email" 
+    name="user_email" 
+    placeholder="Email"
+    value="{{ old_values.get('user_email', '') }}" 
+    required
+    title="Enter a valid email address">
 
-    <button>Save changes</button>
-  </form>
+  <button>Save changes</button>
+</form>
 
   <p><a href="{{ url_for('profile') }}">Cancel</a></p>
 </main>

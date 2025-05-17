@@ -203,18 +203,8 @@ def post_item():
         </div>
         """
 
-        blank_form_html = """
-        <form id="item-form" mix-post="/item" enctype="multipart/form-data">
-          <input name="item_name"        type="text"     placeholder="Name"        value="" required>
-          <textarea name="item_description" placeholder="Description" required></textarea>
-          <input name="item_price"       type="number"   placeholder="Price"       value="" required>
-          <input name="item_address"     type="text"     placeholder="Address"     value="" required>
-          <input name="item_lat"         type="text"     placeholder="Latitude"    value="" required>
-          <input name="item_lon"         type="text"     placeholder="Longitude"   value="" required>
-          <input name="files"            type="file"     multiple>
-          <button>Upload skate spot</button>
-        </form>
-        """
+        blank_form_html = render_template("upload_item_form.html", form=None, errors=None)
+
 
         return f"""
         <mixhtml mix-top="#items">
@@ -240,7 +230,7 @@ def post_item():
 
 ##############################
 #Edit item
-@app.patch("/items/<item_pk>")
+@app.post("/items/<item_pk>")
 def edit_item(item_pk):
     try:
         user = x.validate_user_logged()
@@ -302,11 +292,8 @@ def edit_item(item_pk):
 
         db.commit()
 
-        message = f"""
-        <div class="alert success" mix-ttl="3000">
-            ✅ Spot updated successfully.
-        </div>
-        """
+        return redirect(url_for("profile", message="Item updated successfully"))
+
         return f"""
         <mixhtml mix-update="#form-errors-{item_pk}">
             {message}
@@ -364,8 +351,6 @@ def delete_item(item_pk):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
-# *************!!!!!!!!!!Overstående er valideret!!!!!!!!!!!!!!!**********************
 
 ##############################
 @app.get("/items/page/<page_number>")
@@ -721,9 +706,6 @@ def admin_unblock_user():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-##############################OVERSTÅENDE ER TJEKKET##########################################################################################
-
-
 ##############################
 #Block item
 @app.patch("/admin/block-item")
@@ -927,6 +909,7 @@ def reset_password(reset_key):
 def profile():
     try:
         user = x.validate_user_logged()
+        message = request.args.get("message", "")
         db, cursor = x.db()
 
         q_items = "SELECT * FROM items WHERE item_user_fk = %s AND item_blocked_at = 0 ORDER BY item_created_at DESC"
@@ -943,7 +926,10 @@ def profile():
             user=user,
             items=items,
             active_profile="active",
-            title="Profile"
+            title="Profile",
+            form=None,
+            errors=None,
+            message=message
         )
     except Exception as ex:
         ic(ex)
@@ -1066,6 +1052,28 @@ def confirm_delete_profile():
     except Exception as ex:
         return str(ex), 500
 
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+#Edit spot/item page
+@app.get("/items/<item_pk>/edit")
+def edit_item_page(item_pk):
+    try:
+        user = x.validate_user_logged()
+        item_pk = x.validate_item_pk(item_pk)
+
+        db, cursor = x.db()
+        cursor.execute("SELECT * FROM items WHERE item_pk = %s AND item_user_fk = %s", (item_pk, user["user_pk"]))
+        item = cursor.fetchone()
+        if not item:
+            raise Exception("Item not found")
+
+        return render_template("edit_item.html", item=item)
+    except Exception as ex:
+        ic(ex)
+        return redirect(url_for("profile"))
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()

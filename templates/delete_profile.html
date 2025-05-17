@@ -10,11 +10,14 @@
 
   <form method="POST" action="{{ url_for('confirm_delete_profile') }}">
     <input 
-      class="{{ user_password_error }}" 
-      type="password" 
-      name="user_password" 
-      placeholder="Enter your password to confirm" 
-      required>
+    class="{{ user_password_error }}" 
+    type="password" 
+    name="user_password" 
+    placeholder="Enter your password to confirm" 
+    required 
+    minlength="2" 
+    maxlength="20" 
+    title="Password must be between 2 and 20 characters.">
     <button class="mt1">Delete my account</button>
   </form>
 

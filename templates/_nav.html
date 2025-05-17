@@ -4,7 +4,17 @@
     </a>
 
     <div id="search_container">
-        <input id="input_search" oninput="search()" class="" type="text" placeholder="Search">
+        <input 
+        id="input_search" 
+        oninput="search()"
+        type="text" 
+        placeholder="Search by name"
+        name="q"
+        maxlength="50"
+        pattern=".{1,50}"
+        title="Enter up to 50 characters"
+        required
+    >
         <div id="search_results" class="hidden">
         </div>
     </div>

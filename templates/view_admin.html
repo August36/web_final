@@ -36,31 +36,31 @@
     </section>
 
     <section id="items">
-    <h2>Items</h2>
-    {% for item in items %}
-        <div class="item-card" id="item-card-{{ item.item_pk }}">
-            <p><strong>ID:</strong> {{ item.item_pk }}</p>
-            <p><strong>Name:</strong> {{ item.item_name }}</p>
-            <p><strong>User FK:</strong> {{ item.item_user_fk }}</p>
-            <p><strong>Blocked:</strong> {{ "Yes" if item.item_blocked_at != 0 else "No" }}</p>
+        <h2>Items</h2>
+        {% for item in items %}
+            <div class="item-card" id="item-card-{{ item.item_pk }}">
+                <p><strong>ID:</strong> {{ item.item_pk }}</p>
+                <p><strong>Name:</strong> {{ item.item_name }}</p>
+                <p><strong>User FK:</strong> {{ item.item_user_fk }}</p>
+                <p><strong>Blocked:</strong> {{ "Yes" if item.item_blocked_at != 0 else "No" }}</p>
 
-            <div id="item-actions-{{ item.item_pk }}">
-                {% if item.item_blocked_at == 0 %}
-                    <form mix-patch="/admin/block-item" method="post">
-                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
-                        <button class="btn block">Block</button>
-                    </form>
-                {% else %}
-                    <form mix-patch="/admin/unblock-item" method="post">
-                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
-                        <button class="btn unblock">Unblock</button>
-                    </form>
-                {% endif %}
-                <div class="item-feedback"></div>
+                <div id="item-actions-{{ item.item_pk }}">
+                    {% if item.item_blocked_at == 0 %}
+                        <form mix-patch="/admin/block-item" method="post">
+                            <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
+                            <button class="btn block">Block</button>
+                        </form>
+                    {% else %}
+                        <form mix-patch="/admin/unblock-item" method="post">
+                            <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
+                            <button class="btn unblock">Unblock</button>
+                        </form>
+                    {% endif %}
+                    <div class="item-feedback"></div>
+                </div>
             </div>
-        </div>
-    {% endfor %}
-</section>
+        {% endfor %}
+    </section>
 
 </main>
 

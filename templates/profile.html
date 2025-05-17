@@ -33,68 +33,24 @@
 
   <h2>Upload a spot</h2>
   <!-- Upload-formular -->
-  <form id="item-form" mix-post="/item" enctype="multipart/form-data">
-    <input name="item_name" type="text" placeholder="Name"
-           value="{{ form.item_name if form else '' }}"
-           class="{% if errors and errors.get('item_name') %}input-error{% endif %}" required>
+  {% include "upload_item_form.html" %}
 
-    <textarea name="item_description" placeholder="Description" required
-              class="{% if errors and errors.get('item_description') %}input-error{% endif %}">{{ form.item_description if form else '' }}</textarea>
 
-    <input name="item_price" type="number" placeholder="Price"
-           value="{{ form.item_price if form else '' }}"
-           class="{% if errors and errors.get('item_price') %}input-error{% endif %}" required>
-
-    <input name="item_address" type="text" placeholder="Address"
-           value="{{ form.item_address if form else '' }}"
-           class="{% if errors and errors.get('item_address') %}input-error{% endif %}" required>
-
-    <input name="item_lat" type="text" placeholder="Latitude"
-           value="{{ form.item_lat if form else '' }}"
-           class="{% if errors and errors.get('item_lat') %}input-error{% endif %}" required>
-
-    <input name="item_lon" type="text" placeholder="Longitude"
-           value="{{ form.item_lon if form else '' }}"
-           class="{% if errors and errors.get('item_lon') %}input-error{% endif %}" required>
-
-    <input name="files" type="file" multiple>
-
-    <button>Upload skate spot</button>
-  </form>
-
-  <h2>Your spots</h2>
-    <!-- Dine items -->
-    <section id="items">
+  <section id="items">
+      <h2>Your spots</h2>
+      {% if message %}
+      <div class="alert success" mix-ttl="3000">{{ message }}</div>
+      {% endif %}
           {% for item in items %}
       <div class="item-card" id="x{{ item.item_pk }}">
-        <!-- Spot info (stadig synlig selv når edit er skjult) -->
         <h3>{{ item.item_name }}</h3>
         <p><strong>Price:</strong> {{ item.item_price }} DKK</p>
         <p><strong>Address:</strong> {{ item.item_address }}</p>
         <p>{{ item.item_description }}</p>
-
-        <!-- Knapper -->
-        <button onclick="toggleEditForm('{{ item.item_pk }}')" type="button">Edit</button>
+        <a href="/items/{{ item.item_pk }}/edit">Edit</a>
         <button mix-delete="/items/{{ item.item_pk }}">Delete item</button>
 
-        <!-- Redigeringsform (skjult som standard) -->
-        <div class="edit-form-wrapper mix-hidden" id="edit-form-{{ item.item_pk }}">
-          <form mix-patch="/items/{{ item.item_pk }}" class="edit-item-form">
-            <input type="text" name="item_name" value="{{ item.item_name }}" required>
-            <textarea name="item_description" required>{{ item.item_description }}</textarea>
-            <input type="number" name="item_price" value="{{ item.item_price }}" required>
-            <input type="text" name="item_address" value="{{ item.item_address }}" required>
-            <input type="text" name="item_lat" value="{{ item.item_lat }}" required>
-            <input type="text" name="item_lon" value="{{ item.item_lon }}" required>
-
-            <button>Save changes</button>
-            <button type="button" onclick="toggleEditForm('{{ item.item_pk }}')">Cancel</button>
-
-            <div id="form-errors-{{ item.item_pk }}"></div>
-          </form>
-        </div>
-
-        <!-- Billeder -->
+        <!-- imgs -->
         <div class="item-images">
           {% for img in item.images %}
             <div id="x{{ img.image_pk }}">
@@ -107,7 +63,5 @@
     {% endfor %}
   </section>
 </main>
-
-<script src="{{ url_for('static', filename='profile.js') }}"></script>
 
 {% include "_footer_base.html" %}

@@ -9,19 +9,67 @@
     </h1>
 
     <form action="/signup" method="POST">
-      <!-- Vi giver hvert input en class baseret på en error-variabel.
-     Hvis der ikke er fejl, er variablen tom, og inputtet får ingen class.
-     Hvis der er fejl, sættes class="input_error" for at style inputfeltet med CSS. -->
-        <input class="{{ user_username_error }}" name="user_username" type="text" placeholder="username" value="{{ old_values.get('user_username', '') }}">
-        <input class="{{ user_name_error }}" name="user_name" type="text" placeholder="name" value="{{ old_values.get('user_name', '') }}">
-        <input class="{{ user_last_name_error }}" name="user_last_name" type="text" placeholder="last name" value="{{ old_values.get('user_last_name', '') }}">
-        <input class="{{ user_email_error }}" name="user_email" type="email" placeholder="email" value="{{ old_values.get('user_email', '') }}">
-        <input class="{{ user_password_error }}" name="user_password" type="password" placeholder="password" value="{{ old_values.get('user_password', '') }}"> 
-        <button>
-            Signup
-        </button>
-    </form>
+    <input
+        class="{{ user_username_error }}"
+        name="user_username"
+        type="text"
+        placeholder="username"
+        value="{{ old_values.get('user_username', '') }}"
+        required
+        minlength="2"
+        maxlength="20"
+        title="2–20 characters"
+    >
 
+    <input
+        class="{{ user_name_error }}"
+        name="user_name"
+        type="text"
+        placeholder="name"
+        value="{{ old_values.get('user_name', '') }}"
+        required
+        minlength="2"
+        maxlength="20"
+        title="First name must be 2–20 characters"
+    >
+
+    <input
+        class="{{ user_last_name_error }}"
+        name="user_last_name"
+        type="text"
+        placeholder="last name"
+        value="{{ old_values.get('user_last_name', '') }}"
+        required
+        minlength="2"
+        maxlength="20"
+        title="Last name must be 2–20 characters"
+    >
+
+    <input
+        class="{{ user_email_error }}"
+        name="user_email"
+        type="email"
+        placeholder="email"
+        value="{{ old_values.get('user_email', '') }}"
+        required
+        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        title="Enter a valid email (e.g. name@example.com)"
+    >
+
+    <input
+        class="{{ user_password_error }}"
+        name="user_password"
+        type="password"
+        placeholder="password"
+        value="{{ old_values.get('user_password', '') }}"
+        required
+        minlength="2"
+        maxlength="20"
+        title="Password must be 2–20 characters"
+    >
+
+    <button>Signup</button>
+    </form>
 </main>
 
 {% include "_footer_base.html" %}
