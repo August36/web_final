@@ -93,19 +93,18 @@ MAX_IMAGES_PER_ITEM = 3
 def validate_item_images():
     images_names = []
     if "files" not in request.files:
-        raise Exception("company_ex at least one file")
-    
+        raise Exception("company_ex at least one file must be selected")
+
     files = request.files.getlist('files')
-    
-    # TODO: Fix the validation for 0 files
-    # if not files == [None]:
-    #     raise Exception("company_ex at least one file")  
+
+    if not files or all(f.filename == '' for f in files):
+        raise Exception("company_ex at least one file must be selected")
 
     if len(files) > MAX_IMAGES_PER_ITEM:
         raise Exception("company_ex max 3 images per item")
 
     for the_file in files:
-        file_size = len(the_file.read()) # size is in bytes                 
+        file_size = len(the_file.read())  # size is in bytes                 
         file_name, file_extension = os.path.splitext(the_file.filename)
         the_file.seek(0)
         file_extension = file_extension.lstrip(".")
@@ -119,6 +118,15 @@ def validate_item_images():
         the_file.save(file_path) 
         
     return images_names
+
+
+##############################
+#Tjekker om image_pk er uuid uden bindestreger
+def validate_image_pk(image_pk):
+    image_pk = str(image_pk).strip()
+    if not re.match(r"^[a-fA-F0-9]{32}$", image_pk):
+        raise Exception("Invalid image_pk")
+    return image_pk
 
 ##############################
 REGEX_PAGE_NUMBER = "^[1-9][0-9]*$"
@@ -177,13 +185,20 @@ def validate_user_pk(user_pk):
     if not str(user_pk).isdigit():
         raise Exception("company_ex invalid user id")
     return int(user_pk)
-    
+
 ##############################
 #Validate item_pk
 def validate_item_pk(item_pk):
     if not str(item_pk).isdigit():
         raise Exception("company_ex invalid item id")
     return int(item_pk)
+
+##############################
+#Validate verification_key
+def validate_verification_key(key):
+    if not re.match(r"^[a-f0-9\-]{36}$", key):  # simpel UUID regex
+        raise Exception("Invalid verification key")
+    return key
 
 ##############################
 #Email - Account created

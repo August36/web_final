@@ -106,7 +106,6 @@ def get_item_by_pk(item_pk):
 @app.post("/item")
 def post_item():
     try:
-
         user = x.validate_user_logged()
         validators = [
             ("item_name",        x.validate_item_name),
@@ -245,6 +244,7 @@ def post_item():
 def edit_item(item_pk):
     try:
         user = x.validate_user_logged()
+        item_pk = x.validate_item_pk(item_pk)
         validators = [
             ("item_name",        x.validate_item_name),
             ("item_description", x.validate_item_description),
@@ -326,6 +326,7 @@ def edit_item(item_pk):
 @app.delete("/images/<image_pk>")
 def delete_image(image_pk):
     try:
+        image_pk = x.validate_image_pk(image_pk)
         user = x.validate_user_logged()
         db, cursor = x.db()
         q = "DELETE FROM images WHERE image_pk = %s"
@@ -343,6 +344,7 @@ def delete_image(image_pk):
 def delete_item(item_pk):
     try:
         user = x.validate_user_logged()
+        item_pk = x.validate_item_pk(item_pk)
         db, cursor = x.db()
 
         # Slet billeder tilknyttet item
@@ -527,6 +529,7 @@ def signup():
 @app.get("/verify/<verification_key>")
 def verify_user(verification_key):
     try:
+        verification_key = x.validate_verification_key(verification_key)
         db, cursor = x.db()
 
         # Tjek om en bruger med denne nøgle findes og ikke allerede er verificeret
@@ -623,7 +626,7 @@ def view_admin():
 @app.patch("/admin/block-user")
 def admin_block_user():
     try:
-        user_pk = request.form.get("user_pk")
+        user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
 
         db, cursor = x.db()
         q = "UPDATE users SET user_blocked_at = %s WHERE user_pk = %s"
@@ -674,7 +677,7 @@ def admin_block_user():
 @app.patch("/admin/unblock-user")
 def admin_unblock_user():
     try:
-        user_pk = request.form.get("user_pk")
+        user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
 
         db, cursor = x.db()
         q = "UPDATE users SET user_blocked_at = 0 WHERE user_pk = %s"
@@ -718,12 +721,16 @@ def admin_unblock_user():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################OVERSTÅENDE ER TJEKKET##########################################################################################
+
+
 ##############################
 #Block item
 @app.patch("/admin/block-item")
 def admin_block_item():
     try:
-        item_pk = request.form.get("item_pk")
+        item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
+
 
         db, cursor = x.db()
         cursor.execute("UPDATE items SET item_blocked_at = %s WHERE item_pk = %s", (int(time.time()), item_pk))
@@ -776,7 +783,8 @@ def admin_block_item():
 @app.patch("/admin/unblock-item")
 def admin_unblock_item():
     try:
-        item_pk = request.form.get("item_pk")
+        item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
+
 
         db, cursor = x.db()
         cursor.execute("UPDATE items SET item_blocked_at = 0 WHERE item_pk = %s", (item_pk,))
@@ -872,7 +880,6 @@ def show_reset_form(reset_key):
 @app.post("/reset-password/<reset_key>")
 def reset_password(reset_key):
     try:
-        # Valider adgangskode med din eksisterende funktion i x.py
         try:
             new_password = x.validate_user_password()
         except Exception as ex:
@@ -883,7 +890,6 @@ def reset_password(reset_key):
 
         db, cursor = x.db()
 
-        # Tjek om reset-nøglen eksisterer og ikke er for gammel
         q = "SELECT * FROM users WHERE user_reset_key = %s AND user_deleted_at = 0"
         cursor.execute(q, (reset_key,))
         user = cursor.fetchone()
@@ -892,18 +898,15 @@ def reset_password(reset_key):
             return render_template("reset_password.html",
                 message="Invalid or expired reset link")
 
-        # Tidsbaseret udløb (1 time = 3600 sekunder)
         now = int(time.time())
         if user["user_reset_requested_at"] < now - 3600:
             return render_template("reset_password.html",
                 message="Reset link has expired. Please request a new one.")
 
-        # Hvis alt er ok, opdater password og nulstil nøglen
         hashed = generate_password_hash(new_password)
         q = "UPDATE users SET user_password = %s, user_reset_key = NULL, user_reset_requested_at = 0 WHERE user_reset_key = %s"
         cursor.execute(q, (hashed, reset_key))
 
-        # Hvis nøglen er forkert (bør ikke ske), vis fejl
         if cursor.rowcount != 1:
             return render_template("reset_password.html",
                 reset_key=reset_key,
@@ -920,7 +923,6 @@ def reset_password(reset_key):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-##############################
 @app.get("/profile")
 def profile():
     try:
@@ -931,7 +933,6 @@ def profile():
         cursor.execute(q_items, (user["user_pk"],))
         items = cursor.fetchall()
 
-        #for hvert item - hent tilknyttede billeder
         for item in items:
             q_images = "SELECT * FROM images WHERE image_item_fk = %s"
             cursor.execute(q_images, (item["item_pk"],))
@@ -950,6 +951,7 @@ def profile():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 ##############################
@@ -1073,7 +1075,9 @@ def confirm_delete_profile():
 @app.get("/search")
 def search():
     try:
-        search_for = request.args.get("q", "")
+        search_for = request.args.get("q", "").strip()
+        search_for = x.validate_search_query(search_for)
+
         db, cursor = x.db()
         q = """
         SELECT items.*, (
