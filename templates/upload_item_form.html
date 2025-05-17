@@ -3,13 +3,13 @@
        value="{{ form.item_name if form else '' }}"
        class="{% if errors and errors.get('item_name') %}input-error{% endif %}" 
        required minlength="2" maxlength="60"
-       pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'\"()\-\!?]+$"
+       pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-\!?]+$"
        title="2–60 characters. Letters, numbers and simple punctuation allowed.">
 
     <textarea name="item_description" placeholder="Description" required
           class="{% if errors and errors.get('item_description') %}input-error{% endif %}"
           minlength="5" maxlength="400"
-          pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'\"()\-\!?]+$"
+          pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-\!?]+$"
           title="5–400 characters. Letters, numbers and punctuation allowed.">{{ form.item_description if form else '' }}</textarea>
 
     <input name="item_price" type="number" step="0.01" placeholder="Price"
