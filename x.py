@@ -172,6 +172,20 @@ def validate_search_query(q):
     return q.strip()
 
 ##############################
+#Validate user_pk
+def validate_user_pk(user_pk):
+    if not str(user_pk).isdigit():
+        raise Exception("company_ex invalid user id")
+    return int(user_pk)
+    
+##############################
+#Validate item_pk
+def validate_item_pk(item_pk):
+    if not str(item_pk).isdigit():
+        raise Exception("company_ex invalid item id")
+    return int(item_pk)
+
+##############################
 #Email - Account created
 def send_email(user_name, user_last_name, user_email, user_verification_key):
     verification_link = f"http://localhost/verify/{user_verification_key}"

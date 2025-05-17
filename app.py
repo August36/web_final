@@ -363,6 +363,7 @@ def delete_item(item_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+# *************!!!!!!!!!!Overstående er valideret!!!!!!!!!!!!!!!**********************
 
 ##############################
 @app.get("/items/page/<page_number>")
