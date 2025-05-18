@@ -223,7 +223,7 @@ def post_item():
         {blank_form_html}
         </mixhtml>
 
-        <mixhtml mix-top="#items">
+        <mixhtml mix-after="#items-h2">
         {item_html}
         </mixhtml>
         """, 200
@@ -246,7 +246,7 @@ def post_item():
 ##############################
 #Edit item
 @app.post("/items/<item_pk>")
-def edit_item(item_pk):
+def edit_item_post(item_pk):
     try:
         user = x.validate_user_logged()
         item_pk = x.validate_item_pk(item_pk)
@@ -269,14 +269,15 @@ def edit_item(item_pk):
 
         if form_errors:
             error_html = (
-                "<ul class='error-list'>"
+                "<ul class='alert error'>"
                 + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
                 + "</ul>"
             )
             return f"""
-            <mixhtml mix-update="#form-errors-{item_pk}">
-                {error_html}
+            <mixhtml mix-update="#form-feedback">
+              {error_html}
             </mixhtml>
+            <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
             """, 400
 
         db, cursor = x.db()
@@ -307,18 +308,53 @@ def edit_item(item_pk):
         )
 
         db.commit()
-        return redirect(url_for("profile", message="Item updated successfully")), 302
+
+        return f"""
+        <mixhtml mix-redirect="{url_for('profile')}?message=Spot+updated+successfully"></mixhtml>
+        """, 200
 
     except Exception as ex:
         ic(ex)
-        return str(ex), 500
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+        """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+#Edit spot/item page
+@app.get("/items/<item_pk>/edit")
+def edit_item_page(item_pk):
+    try:
+        user = x.validate_user_logged()
+        item_pk = x.validate_item_pk(item_pk)
+
+        db, cursor = x.db()
+        cursor.execute(
+            "SELECT * FROM items WHERE item_pk = %s AND item_user_fk = %s", 
+            (item_pk, user["user_pk"])
+        )
+        item = cursor.fetchone()
+        if not item:
+            raise Exception("Item not found")
+
+        return render_template("edit_item.html", item=item), 200
+
+    except Exception as ex:
+        ic(ex)
+        return redirect(url_for("profile")), 302
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
+#Delete image
 @app.delete("/images/<image_pk>")
 def delete_image(image_pk):
     try:
@@ -330,11 +366,24 @@ def delete_image(image_pk):
         cursor.execute(q, (image_pk,))
         db.commit()
 
-        return f"""<mixhtml mix-remove="#x{image_pk}"></mixhtml>""", 200
+        return f"""
+        <mixhtml mix-remove="#x{image_pk}"></mixhtml>
+        <mixhtml mix-update="#image-delete-feedback">
+        <div class='alert success' mix-ttl="3000">
+            ✅ Image deleted successfully
+        </div>
+        </mixhtml>
+        """, 200
+
 
     except Exception as ex:
         ic(ex)
         return "", 500
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 
 ##############################
 # DELETE CARD
@@ -1199,34 +1248,6 @@ def confirm_delete_profile():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
-##############################
-#Edit spot/item page
-@app.get("/items/<item_pk>/edit")
-def edit_item_page(item_pk):
-    try:
-        user = x.validate_user_logged()
-        item_pk = x.validate_item_pk(item_pk)
-
-        db, cursor = x.db()
-        cursor.execute(
-            "SELECT * FROM items WHERE item_pk = %s AND item_user_fk = %s", 
-            (item_pk, user["user_pk"])
-        )
-        item = cursor.fetchone()
-        if not item:
-            raise Exception("Item not found")
-
-        return render_template("edit_item.html", item=item), 200
-
-    except Exception as ex:
-        ic(ex)
-        return redirect(url_for("profile")), 302
-
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-
 
 ##############################
 #search

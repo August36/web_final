@@ -1,26 +1,48 @@
+{% include "_header.html" %}
+{% include "_nav.html" %}
+
 <h1>Edit your spot</h1>
 
-<form method="post" action="/items/{{ item.item_pk }}" class="edit-item-form">
-    <input type="text" name="item_name" value="{{ item.item_name }}" 
-        required minlength="2" maxlength="60"
-        pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'&quot;()\-\!?]+$"
-        title="2–60 characters. Letters, numbers and simple punctuation allowed.">
+<form mix-post="/items/{{ item.item_pk }}" class="edit-item-form">
+  <input type="text" name="item_name" placeholder="Name"
+    value="{{ item.item_name }}"
+    mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{2,60}$"
+    title="Name must be 2–60 characters. Letters, numbers and simple punctuation allowed."
+    class="input" />
 
-    <textarea name="item_description" required minlength="5" maxlength="400"
-            pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'&quot;()\-\!?]+$"
-            title="5–400 characters.">{{ item.item_description }}</textarea>
+  <textarea name="item_description" placeholder="Description"
+    mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{5,400}$"
+    title="Description must be 5–400 characters. Letters, numbers and punctuation allowed."
+    class="input">{{ item.item_description }}</textarea>
 
+  <input type="number" name="item_price" placeholder="Price"
+    value="{{ item.item_price }}"
+    mix-check="^\d{1,6}(\.\d{1,2})?$"
+    title="Enter a price like 199.95. Max 6 digits before dot and 2 after."
+    class="input" />
 
-    <input type="number" name="item_price" value="{{ item.item_price }}" required min="0" max="999999" step="0.01">
+  <input type="text" name="item_address" placeholder="Address"
+    value="{{ item.item_address }}"
+    mix-check="^.{5,100}$"
+    title="Address must be 5–100 characters."
+    class="input" />
 
-    <input type="text" name="item_address" value="{{ item.item_address }}" required minlength="5" maxlength="100">
+  <input type="text" name="item_lat" placeholder="Latitude"
+    value="{{ item.item_lat }}"
+    mix-check="^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$"
+    title="Latitude must be between -90 and 90 (e.g. 55.6761)."
+    class="input" />
 
-    <input type="text" name="item_lat" value="{{ item.item_lat }}" required
-         pattern="^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$">
+  <input type="text" name="item_lon" placeholder="Longitude"
+    value="{{ item.item_lon }}"
+    mix-check="^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
+    title="Longitude must be between -180 and 180 (e.g. 12.5683)."
+    class="input" />
 
-    <input type="text" name="item_lon" value="{{ item.item_lon }}" required
-         pattern="^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$">
-
-   <button>Save changes</button>
-   <a href="{{ url_for('profile') }}">Cancel</a>
+  <button class="btn" mix-await="Saving..." mix-default="Save changes">Save changes</button>
+  <a href="{{ url_for('profile') }}">Cancel</a>
 </form>
+
+<div id="form-feedback"></div>
+
+{% include "_footer_base.html" %}

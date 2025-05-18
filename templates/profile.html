@@ -37,32 +37,40 @@
 <div id="form-feedback"></div>
 
 
-  <section id="items">
-      <h2>Your spots</h2>
-      {% if message %}
-      <div class="alert success" mix-ttl="3000">{{ message }}</div>
-      {% endif %}
-          {% for item in items %}
-      <div class="item-card" id="x{{ item.item_pk }}">
-        <h3>{{ item.item_name }}</h3>
-        <p><strong>Price:</strong> {{ item.item_price }} DKK</p>
-        <p><strong>Address:</strong> {{ item.item_address }}</p>
-        <p>{{ item.item_description }}</p>
-        <a href="/items/{{ item.item_pk }}/edit">Edit spot</a>
-        <button mix-delete="/items/{{ item.item_pk }}">Delete item</button>
+<section id="items">
+  <h2 id="items-h2">Your spots</h2>
 
-        <!-- imgs -->
-        <div class="item-images">
-          {% for img in item.images %}
-            <div id="x{{ img.image_pk }}">
-              <img class="uploaded_imgs_profile" src="/static/uploads/{{ img.image_name }}" alt="{{ img.image_name }}">
-              <button mix-delete="/images/{{ img.image_pk }}">Delete image</button>
-            </div>
-          {% endfor %}
-        </div>
+  <!-- Edit item message container -->
+  <div id="edit-success-feedback">
+    {% if message %}
+      <div class="alert success" mix-ttl="3000">{{ message }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Delete img message container -->
+  <div id="image-delete-feedback"></div>
+
+  {% for item in items %}
+    <div class="item-card" id="x{{ item.item_pk }}">
+      <h3>{{ item.item_name }}</h3>
+      <p><strong>Price:</strong> {{ item.item_price }} DKK</p>
+      <p><strong>Address:</strong> {{ item.item_address }}</p>
+      <p>{{ item.item_description }}</p>
+      <a href="/items/{{ item.item_pk }}/edit">Edit spot</a>
+      <button mix-delete="/items/{{ item.item_pk }}">Delete item</button>
+
+      <!-- imgs -->
+      <div class="item-images">
+        {% for img in item.images %}
+          <div id="x{{ img.image_pk }}">
+            <img class="uploaded_imgs_profile" src="/static/uploads/{{ img.image_name }}" alt="{{ img.image_name }}">
+            <button mix-delete="/images/{{ img.image_pk }}">Delete image</button>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
-  </section>
+    </div>
+  {% endfor %}
+</section>
 </main>
 
 {% include "_footer_base.html" %}
