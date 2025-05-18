@@ -132,14 +132,15 @@ def post_item():
 
         if form_errors:
             error_html = (
-                "<ul class='error-list'>"
+                "<ul class='alert error'>"
                 + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
                 + "</ul>"
             )
             return f"""
-            <mixhtml mix-update="#form-errors">
+            <mixhtml mix-update="#form-feedback">
               {error_html}
             </mixhtml>
+            <mixhtml mix-function="resetButtonText">Upload skate spot</mixhtml>
             """, 400
 
         db, cursor = x.db()
@@ -220,17 +221,26 @@ def post_item():
           {blank_form_html}
         </mixhtml>
 
-        <mixhtml mix-update="#form-errors">
+        <mixhtml mix-replace="#form-feedback">
+        <div class='alert success' mix-ttl="3000">
+            ✅ Spot uploaded successfully
+        </div>
         </mixhtml>
         """, 200
 
     except Exception as ex:
         ic(ex)
-        return str(ex), 500
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        <mixhtml mix-function="resetButtonText">Upload skate spot</mixhtml>
+        """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 ##############################
@@ -473,69 +483,73 @@ def signup():
         db.commit()
         x.send_email(user_name, user_last_name, user_email, verification_key)
 
-        return redirect(url_for("show_login", message=(
-            "Thank you for signing up. A verification email has been sent to your inbox. "
-            "Please click the link in the email to verify your account before logging in."
-        ))), 302
+        return """
+        <mixhtml mix-redirect='/login?message=Thank you for signing up. Please verify your email before logging in.'></mixhtml>
+        """, 200
 
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()
-        old_values = request.form.to_dict()
 
         if "username" in str(ex):
-            old_values.pop("user_username", None)
-            return render_template("signup.html",
-                error_message="Invalid username",
-                old_values=old_values,
-                user_username_error="input_error"), 400
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Brugernavn skal være 2–20 tegn og må ikke være i brug.</div>
+            </mixhtml>
+            """, 400
 
         if "first name" in str(ex):
-            old_values.pop("user_name", None)
-            return render_template("signup.html",
-                error_message="Invalid name",
-                old_values=old_values,
-                user_name_error="input_error"), 400
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Fornavn skal være 2–20 tegn.</div>
+            </mixhtml>
+            """, 400
 
         if "last name" in str(ex):
-            old_values.pop("user_last_name", None)
-            return render_template("signup.html",
-                error_message="Invalid last name",
-                old_values=old_values,
-                user_last_name_error="input_error"), 400
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Efternavn skal være 2–20 tegn.</div>
+            </mixhtml>
+            """, 400
 
         if "Invalid email" in str(ex):
-            old_values.pop("user_email", None)
-            return render_template("signup.html",
-                error_message="Invalid email",
-                old_values=old_values,
-                user_email_error="input_error"), 400
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Ugyldig email.</div>
+            </mixhtml>
+            """, 400
 
         if "password" in str(ex):
-            old_values.pop("user_password", None)
-            return render_template("signup.html",
-                error_message="Invalid password",
-                old_values=old_values,
-                user_password_error="input_error"), 400
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Password skal være 2–20 tegn.</div>
+            </mixhtml>
+            """, 400
 
         if "user_email" in str(ex):
-            return redirect(url_for("show_signup",
-                error_message="Email already exists",
-                old_values=old_values,
-                email_error=True)), 302
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Denne email er allerede i brug.</div>
+            </mixhtml>
+            """, 400
 
         if "user_username" in str(ex):
-            return redirect(url_for("show_signup",
-                error_message="Username already exists",
-                old_values=request.form,
-                user_username_error=True)), 302
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Dette brugernavn er allerede i brug.</div>
+            </mixhtml>
+            """, 400
 
-        return redirect(url_for("show_signup",
-            error_message=ex.args[0])), 302
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class='alert error'>Ukendt fejl: {str(ex)}</div>
+        </mixhtml>
+        """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 @app.get("/verify/<verification_key>")
@@ -593,7 +607,6 @@ def login():
         user_password = x.validate_user_password()
 
         db, cursor = x.db()
-
         q = "SELECT * FROM users WHERE user_email = %s AND user_deleted_at = 0"
         cursor.execute(q, (user_email,))
         user = cursor.fetchone()
@@ -602,37 +615,42 @@ def login():
             raise Exception("User not found")
 
         if not user["user_verified"]:
-            return render_template(
-                "login.html",
-                title="Login",
-                active_login="active",
-                message="Please verify your email before logging in."
-            ), 403
+            return f"""
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Please verify your email before logging in.</div>
+            </mixhtml>
+            """, 403
 
         if user["user_blocked_at"] != 0:
-            return render_template(
-                "login.html",
-                title="Login",
-                active_login="active",
-                message="Your account is blocked."
-            ), 403
+            return f"""
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Your account is blocked.</div>
+            </mixhtml>
+            """, 403
 
         if not check_password_hash(user["user_password"], user_password):
             raise Exception("Invalid credentials")
 
         user.pop("user_password")
-        ic(user)
         session["user"] = user
+        ic(user)
 
-        return redirect(url_for("profile")), 302
+        return """
+        <mixhtml mix-redirect='/profile'></mixhtml>
+        """, 200
 
     except Exception as ex:
         ic(ex)
-        return str(ex), 400
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class='alert error'>{str(ex)}</div>
+        </mixhtml>
+        """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 ##############################

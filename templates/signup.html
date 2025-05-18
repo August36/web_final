@@ -1,75 +1,70 @@
 {% include "_header.html" %}
 {% include "_nav.html" %}
 
-
 <main>
+  <h1>{{ error_message }}</h1>
 
-    <h1>
-        {{ error_message }}
-    </h1>
-
-    <form action="/signup" method="POST">
-    <input
-        class="{{ user_username_error }}"
-        name="user_username"
-        type="text"
-        placeholder="username"
-        value="{{ old_values.get('user_username', '') }}"
-        required
-        minlength="2"
-        maxlength="20"
-        title="2–20 characters"
+  <form mix-post="/signup" method="post">
+    <input 
+      class="input"
+      name="user_username"
+      type="text"
+      placeholder="Username"
+      title="Username must be between 2 and 20 characters, letters and numbers only"
+      value="{{ old_values.get('user_username', '') }}"
+      mix-check="^[a-zA-Z0-9_]{2,20}$"
     >
 
-    <input
-        class="{{ user_name_error }}"
-        name="user_name"
-        type="text"
-        placeholder="name"
-        value="{{ old_values.get('user_name', '') }}"
-        required
-        minlength="2"
-        maxlength="20"
-        title="First name must be 2–20 characters"
+    <input 
+      class="input"
+      name="user_name"
+      type="text"
+      placeholder="First name"
+      title="First name must be between 2 and 20 characters, letters only"
+      value="{{ old_values.get('user_name', '') }}"
+      mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
     >
 
-    <input
-        class="{{ user_last_name_error }}"
-        name="user_last_name"
-        type="text"
-        placeholder="last name"
-        value="{{ old_values.get('user_last_name', '') }}"
-        required
-        minlength="2"
-        maxlength="20"
-        title="Last name must be 2–20 characters"
+    <input 
+      class="input"
+      name="user_last_name"
+      type="text"
+      placeholder="Last name"
+      title="Last name must be between 2 and 20 characters, letters only"
+      value="{{ old_values.get('user_last_name', '') }}"
+      mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
     >
 
-    <input
-        class="{{ user_email_error }}"
-        name="user_email"
-        type="email"
-        placeholder="email"
-        value="{{ old_values.get('user_email', '') }}"
-        required
-        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        title="Enter a valid email (e.g. name@example.com)"
+    <input 
+      class="input"
+      name="user_email"
+      type="text"
+      placeholder="Email"
+      title="Enter a valid email (e.g. test@example.com)"
+      value="{{ old_values.get('user_email', '') }}"
+      mix-check="^[^@]+@[^@]+\.[^@]+$"
     >
 
-    <input
-        class="{{ user_password_error }}"
-        name="user_password"
-        type="password"
-        placeholder="password"
-        value="{{ old_values.get('user_password', '') }}"
-        required
-        minlength="2"
-        maxlength="20"
-        title="Password must be 2–20 characters"
+    <input 
+      class="input"
+      name="user_password"
+      type="password"
+      placeholder="Password"
+      title="Password must be between 2 and 20 characters"
+      value="{{ old_values.get('user_password', '') }}"
+      mix-check="^.{2,20}$"
     >
 
-    <button>Signup</button>
-    </form>
+    <button 
+      class="btn" 
+      mix-await="Signing up..." 
+      mix-default="Signup"
+    >
+      Signup
+    </button>
+  </form>
+
+  <div id="form-feedback"></div>
 </main>
 
 {% include "_footer_base.html" %}

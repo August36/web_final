@@ -1,47 +1,51 @@
 <form id="item-form" mix-post="/item" enctype="multipart/form-data">
-    <input name="item_name" type="text" placeholder="Name"
-       value="{{ form.item_name if form else '' }}"
-       class="{% if errors and errors.get('item_name') %}input-error{% endif %}" 
-       required minlength="2" maxlength="60"
-       pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-\!?]+$"
-       title="2–60 characters. Letters, numbers and simple punctuation allowed.">
+  <input name="item_name" type="text" placeholder="Name"
+    value="{{ form.item_name if form else '' }}"
+    mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{2,60}$"
+    title="Name must be 2–60 characters. Letters, numbers and simple punctuation allowed."
+    class="input">
 
-    <textarea name="item_description" placeholder="Description" required
-          class="{% if errors and errors.get('item_description') %}input-error{% endif %}"
-          minlength="5" maxlength="400"
-          pattern="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-\!?]+$"
-          title="5–400 characters. Letters, numbers and punctuation allowed.">{{ form.item_description if form else '' }}</textarea>
+  <textarea name="item_description" placeholder="Description"
+    mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{5,400}$"
+    title="Description must be 5–400 characters. Letters, numbers and punctuation allowed."
+    class="input">{{ form.item_description if form else '' }}</textarea>
 
-    <input name="item_price" type="number" step="0.01" placeholder="Price"
-       value="{{ form.item_price if form else '' }}"
-       class="{% if errors and errors.get('item_price') %}input-error{% endif %}" 
-       required min="0" max="999999"
-       title="Price must be a number with up to 2 decimals. Max 999999.">
+  <input name="item_price" type="number" step="0.01" placeholder="Price"
+    value="{{ form.item_price if form else '' }}"
+    mix-check="^\d{1,6}(\.\d{1,2})?$"
+    title="Enter a price like 199.95. Max 6 digits before dot and 2 after."
+    class="input">
 
-    <input name="item_address" type="text" placeholder="Address"
-       value="{{ form.item_address if form else '' }}"
-       class="{% if errors and errors.get('item_address') %}input-error{% endif %}" 
-       required minlength="5" maxlength="100"
-       title="5–100 characters. Letters, numbers and symbols like # and ° allowed.">
+  <input name="item_address" type="text" placeholder="Address"
+    value="{{ form.item_address if form else '' }}"
+    mix-check="^.{5,100}$"
+    title="Address must be 5–100 characters."
+    class="input">
 
-    <input name="item_lat" type="text" placeholder="Latitude"
-       value="{{ form.item_lat if form else '' }}"
-       class="{% if errors and errors.get('item_lat') %}input-error{% endif %}" 
-       required
-       pattern="^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$"
-       title="Enter a valid latitude between -90 and 90.">
+  <input name="item_lat" type="text" placeholder="Latitude"
+    value="{{ form.item_lat if form else '' }}"
+    mix-check="^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$"
+    title="Latitude must be between -90 and 90 (e.g. 55.6761)."
+    class="input">
 
-    <input name="item_lon" type="text" placeholder="Longitude"
-       value="{{ form.item_lon if form else '' }}"
-       class="{% if errors and errors.get('item_lon') %}input-error{% endif %}" 
-       required
-       pattern="^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
-       title="Enter a valid longitude between -180 and 180.">
+  <input name="item_lon" type="text" placeholder="Longitude"
+    value="{{ form.item_lon if form else '' }}"
+    mix-check="^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
+    title="Longitude must be between -180 and 180 (e.g. 12.5683)."
+    class="input">
 
-    <input name="files" type="file" multiple 
-       accept=".png,.jpg,.jpeg,.gif,.webp"
-       title="Upload 1–3 images (PNG, JPG, JPEG, GIF, or WEBP). Max 1MB per image.">
+   <input 
+   name="files" 
+   type="file" 
+   multiple
+   accept=".png,.jpg,.jpeg,.gif,.webp"
+   class="input"
+   title="Please select between 1 and 3 images (PNG, JPG, JPEG, GIF, or WEBP)"
+   mix-check=".*">
 
+  <button class="btn" mix-await="Uploading..." mix-default="Upload skate spot">
+    Upload skate spot
+  </button>
+</form>
 
-    <button>Upload skate spot</button>
-  </form>
+<div id="form-feedback"></div>
