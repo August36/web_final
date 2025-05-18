@@ -57,7 +57,7 @@
       <p><strong>Address:</strong> {{ item.item_address }}</p>
       <p>{{ item.item_description }}</p>
       <a href="/items/{{ item.item_pk }}/edit">Edit spot</a>
-      <button mix-delete="/items/{{ item.item_pk }}">Delete item</button>
+      <button mix-delete="/items/{{ item.item_pk }}">Delete item {{ item.item_name }}</button>
 
       <!-- imgs -->
       <div class="item-images">

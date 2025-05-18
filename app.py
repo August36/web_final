@@ -241,8 +241,6 @@ def post_item():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
-
 ##############################
 #Edit item
 @app.post("/items/<item_pk>")
