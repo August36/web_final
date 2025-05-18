@@ -7,6 +7,7 @@ import uuid
 import os
 import json
 import re
+import requests
 
 from icecream import ic
 ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
@@ -24,13 +25,22 @@ def before_request():
 @app.get("/rates")
 def get_rates():
     try:
-        data = requests.get("https://api.exchangerate-api.com/v4/latest/usd")
-        ic(data.json())
+        response = requests.get("https://api.exchangerate-api.com/v4/latest/usd")
+        data = response.json()
+
         with open("rates.txt", "w") as file:
-            file.write(data.text)
-        return data.json()
+            file.write(response.text)
+
+        return {
+            "status": "success",
+            "base": data.get("base"),
+            "date": data.get("date")
+        }
     except Exception as ex:
-        ic(ex)
+        return {
+            "status": "error",
+            "message": str(ex)
+        }, 500
 
 ##############################
 @app.after_request
@@ -70,8 +80,12 @@ def view_index():
             q_images = "SELECT * FROM images WHERE image_item_fk = %s"
             cursor.execute(q_images, (items[0]["item_pk"],))
             images = cursor.fetchall()
+
+        rates = {}
+        with open("rates.txt", "r") as file:
+            rates = json.loads(file.read())
         
-        return render_template("view_index.html", title="Skatespots CPH", items=items, images=images), 200
+        return render_template("view_index.html", title="Skatespots CPH", items=items, images=images, rates=rates), 200
 
     except Exception as ex:
         ic(ex)
@@ -99,7 +113,11 @@ def get_item_by_pk(item_pk):
         cursor.execute(q_images, (item_pk,))
         images = cursor.fetchall()
 
-        html_item = render_template("_item.html", item=item, images=images)
+        rates = {}
+        with open("rates.txt", "r") as file:
+            rates = json.loads(file.read())
+
+        html_item = render_template("_item.html", item=item, images=images, rates=rates)
 
         return f"""
             <mixhtml mix-replace="#item">
@@ -119,6 +137,76 @@ def get_item_by_pk(item_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+@app.get("/items/page/<page_number>")
+def get_items_by_page(page_number):
+    try:
+        page_number = x.validate_page_number(page_number)
+        items_per_page = 2
+        offset = (page_number - 1) * items_per_page
+        extra_item = items_per_page + 1
+
+        db, cursor = x.db()
+
+        q = """
+        SELECT items.*, (
+            SELECT image_name
+            FROM images
+            WHERE images.image_item_fk = items.item_pk
+            ORDER BY image_pk ASC
+            LIMIT 1
+        ) AS item_image
+        FROM items
+        WHERE item_blocked_at = 0
+        ORDER BY item_created_at
+        LIMIT %s OFFSET %s
+        """
+        cursor.execute(q, (extra_item, offset))
+        items = cursor.fetchall()
+
+        rates = {}
+        with open("rates.txt", "r") as file:
+            rates = json.loads(file.read())
+
+        html = ""
+        for item in items[:items_per_page]:
+            html += render_template("_item_mini.html", item=item, rates=rates)
+
+        button = ""
+        if len(items) == extra_item:
+            button = render_template("_button_more_items.html", page_number=page_number + 1)
+
+        return f"""
+            <mixhtml mix-bottom="#items">
+                {html}
+            </mixhtml>
+            <mixhtml mix-replace="#button_more_items">
+                {button}
+            </mixhtml>
+            <mixhtml mix-function="add_markers_to_map">
+                {json.dumps(items[:items_per_page], default=str)}
+            </mixhtml>
+        """, 200
+
+    except Exception as ex:
+        ic(ex)
+
+        if "company_ex page_number" in str(ex):
+            return """
+                <mixhtml mix-top="body">
+                    page number invalid
+                </mixhtml>
+            """, 400
+
+        return """
+            <mixhtml mix-top="body">
+                ups
+            </mixhtml>
+        """, 500
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
 @app.post("/item")
@@ -437,73 +525,6 @@ def delete_item(item_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
-##############################
-@app.get("/items/page/<page_number>")
-def get_items_by_page(page_number):
-    try:
-        page_number = x.validate_page_number(page_number)
-        items_per_page = 2
-        offset = (page_number - 1) * items_per_page
-        extra_item = items_per_page + 1
-
-        db, cursor = x.db()
-
-        q = """
-        SELECT items.*, (
-            SELECT image_name
-            FROM images
-            WHERE images.image_item_fk = items.item_pk
-            ORDER BY image_pk ASC
-            LIMIT 1
-        ) AS item_image
-        FROM items
-        WHERE item_blocked_at = 0
-        ORDER BY item_created_at
-        LIMIT %s OFFSET %s
-        """
-        cursor.execute(q, (extra_item, offset))
-        items = cursor.fetchall()
-
-        html = ""
-        for item in items[:items_per_page]:
-            html += render_template("_item_mini.html", item=item)
-
-        button = ""
-        if len(items) == extra_item:
-            button = render_template("_button_more_items.html", page_number=page_number + 1)
-
-        return f"""
-            <mixhtml mix-bottom="#items">
-                {html}
-            </mixhtml>
-            <mixhtml mix-replace="#button_more_items">
-                {button}
-            </mixhtml>
-            <mixhtml mix-function="add_markers_to_map">
-                {json.dumps(items[:items_per_page], default=str)}
-            </mixhtml>
-        """, 200
-
-    except Exception as ex:
-        ic(ex)
-
-        if "company_ex page_number" in str(ex):
-            return """
-                <mixhtml mix-top="body">
-                    page number invalid
-                </mixhtml>
-            """, 400
-
-        return """
-            <mixhtml mix-top="body">
-                ups
-            </mixhtml>
-        """, 500
-
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
 
 ##############################
 @app.get("/signup")
