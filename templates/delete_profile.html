@@ -4,22 +4,19 @@
 <main id="delete-profile">
   <h1>Delete Profile</h1>
 
-  {% if message %}
-    <p class="info-message">{{ message }}</p>
-  {% endif %}
-
-  <form method="POST" action="{{ url_for('confirm_delete_profile') }}">
+  <form mix-post="/profile/delete" id="delete-profile-form">
     <input 
-    class="{{ user_password_error }}" 
-    type="password" 
-    name="user_password" 
-    placeholder="Enter your password to confirm" 
-    required 
-    minlength="2" 
-    maxlength="20" 
-    title="Password must be between 2 and 20 characters.">
-    <button class="mt1">Delete my account</button>
+      class="input" 
+      type="password" 
+      name="user_password" 
+      placeholder="Enter your password to confirm" 
+      mix-check="^.{2,20}$"
+      title="Password must be between 2 and 20 characters.">
+
+    <button class="btn" mix-await="Deleting..." mix-default="Delete my account">Delete my account</button>
   </form>
+
+  <div id="form-feedback"></div>
 
   <p><a href="{{ url_for('profile') }}">Cancel</a></p>
 </main>

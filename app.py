@@ -193,7 +193,12 @@ def post_item():
             <p><strong>Price:</strong> {values['item_price']} DKK</p>
             <p><strong>Address:</strong> {values['item_address']}</p>
             <p>{values['item_description']}</p>
-            <div class="item-images">
+
+            <a href="/items/{item_pk}/edit">Edit spot</a>
+            <button mix-delete="/items/{item_pk}">Delete item {values['item_name']}</button>
+
+            <div class="item-images"></div>
+        </div>
         """
         for img in images:
             item_html += f"""
@@ -308,7 +313,7 @@ def edit_item_post(item_pk):
         db.commit()
 
         return f"""
-        <mixhtml mix-redirect="{url_for('profile')}?message=Spot+updated+successfully"></mixhtml>
+        <mixhtml mix-redirect="/profile?item_message=✅ Item updated successfully"></mixhtml>
         """, 200
 
     except Exception as ex:
@@ -366,13 +371,12 @@ def delete_image(image_pk):
 
         return f"""
         <mixhtml mix-remove="#x{image_pk}"></mixhtml>
-        <mixhtml mix-update="#image-delete-feedback">
+        <mixhtml mix-after="#items-h2">
         <div class='alert success' mix-ttl="3000">
             ✅ Image deleted successfully
         </div>
         </mixhtml>
         """, 200
-
 
     except Exception as ex:
         ic(ex)
@@ -403,7 +407,14 @@ def delete_item(item_pk):
 
         db.commit()
 
-        return f"""<mixhtml mix-remove="#x{item_pk}"></mixhtml>""", 200
+        return f"""
+        <mixhtml mix-remove="#x{item_pk}"></mixhtml>
+        <mixhtml mix-after="#items-h2">
+        <div class='alert success' mix-ttl="3000">
+            ✅ Spot deleted successfully
+        </div>
+        </mixhtml>
+        """, 200
 
     except Exception as ex:
         ic(ex)
@@ -638,7 +649,10 @@ def verify_user(verification_key):
 @app.get("/login")
 def show_login():
     active_login = "active"
-    message = request.args.get("message", "")
+    profile_deleted_msg = request.args.get("profile_deleted", "")
+    # Hvis profile_deleted_msg er tom, brug den oprindelige "message"
+    default_message = request.args.get("message", "")
+    message = profile_deleted_msg if profile_deleted_msg else default_message
     return render_template(
         "login.html",
         title="Login",
@@ -1076,7 +1090,8 @@ def reset_password(reset_key):
 def profile():
     try:
         user = x.validate_user_logged()
-        message = request.args.get("message", "")
+        profile_message = request.args.get("profile_message", "")
+        item_message = request.args.get("item_message", "")
 
         db, cursor = x.db()
 
@@ -1101,7 +1116,8 @@ def profile():
             title="Profile",
             form=None,
             errors=None,
-            message=message
+            profile_message=profile_message,
+            item_message=item_message
         ), 200
 
     except Exception as ex:
@@ -1116,6 +1132,7 @@ def profile():
 ##############################
 @app.get("/profile/edit")
 def edit_profile():
+#edit_profile get
     try:
         if "user" not in session:
             return redirect(url_for("show_login")), 302
@@ -1132,58 +1149,77 @@ def edit_profile():
         return str(ex), 500
 
 ##############################
+#edit_profile
 @app.post("/profile/edit")
 def update_profile():
     try:
-        if "user" not in session:
-            return redirect(url_for("show_login")), 302
-
-        user_pk = session["user"]["user_pk"]
+        user = x.validate_user_logged()
+        user_pk = user["user_pk"]
 
         # Valider input
-        user_username = x.validate_user_username()
-        user_name = x.validate_user_name()
-        user_last_name = x.validate_user_last_name()
-        user_email = x.validate_user_email()
+        validators = [
+            ("user_username",   x.validate_user_username),
+            ("user_name",       x.validate_user_name),
+            ("user_last_name",  x.validate_user_last_name),
+            ("user_email",      x.validate_user_email),
+        ]
 
+        values, form_errors = {}, {}
+        for field, fn in validators:
+            try:
+                values[field] = fn()
+            except Exception as ex:
+                form_errors[field] = str(ex)
+
+        if form_errors:
+            error_html = (
+                "<ul class='alert error'>"
+                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+                + "</ul>"
+            )
+            return f"""
+            <mixhtml mix-update="#profile-feedback">
+              {error_html}
+            </mixhtml>
+            <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+            """, 400
+
+        # Update DB
         db, cursor = x.db()
-
         cursor.execute("""
-        UPDATE users
-        SET user_username = %s,
-            user_name = %s,
-            user_last_name = %s,
-            user_email = %s,
-            user_updated_at = %s
-        WHERE user_pk = %s AND user_deleted_at = 0
+            UPDATE users
+            SET user_username = %s,
+                user_name = %s,
+                user_last_name = %s,
+                user_email = %s,
+                user_updated_at = %s
+            WHERE user_pk = %s AND user_deleted_at = 0
         """, (
-            user_username,
-            user_name,
-            user_last_name,
-            user_email,
+            values["user_username"],
+            values["user_name"],
+            values["user_last_name"],
+            values["user_email"],
             int(time.time()),
             user_pk
         ))
         db.commit()
 
         # Opdater session
-        session["user"].update({
-            "user_username": user_username,
-            "user_name": user_name,
-            "user_last_name": user_last_name,
-            "user_email": user_email
-        })
+        session["user"].update(values)
 
-        return redirect(url_for("profile")), 302
+        return """
+        <mixhtml mix-redirect="/profile?profile_message=Profile updated successfully"></mixhtml>
+        """, 200
+
 
     except Exception as ex:
-        old_values = request.form.to_dict()
-        return render_template(
-            "edit_profile.html",
-            message=str(ex),
-            old_values=old_values,
-            user=session["user"]
-        ), 500
+        ic(ex)
+        return f"""
+        <mixhtml mix-update="#profile-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+        """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
@@ -1217,35 +1253,39 @@ def confirm_delete_profile():
         db, cursor = x.db()
 
         # Tjek password
-        q = "SELECT user_password FROM users WHERE user_pk = %s"
-        cursor.execute(q, (user_pk,))
+        cursor.execute("SELECT user_password FROM users WHERE user_pk = %s", (user_pk,))
         result = cursor.fetchone()
 
         if not result or not check_password_hash(result["user_password"], user_password):
-            return render_template(
-                "delete_profile.html",
-                message="Invalid password",
-                user_password_error="input_error",
-                old_values=request.form
-            ), 403
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Invalid password. Try again.</div>
+            </mixhtml>
+            """, 403
 
         # Soft delete
         timestamp = int(time.time())
-        q = "UPDATE users SET user_deleted_at = %s WHERE user_pk = %s"
-        cursor.execute(q, (timestamp, user_pk))
+        cursor.execute("UPDATE users SET user_deleted_at = %s WHERE user_pk = %s", (timestamp, user_pk))
         db.commit()
 
         x.send_delete_confirmation(user_email)
         session.pop("user", None)
 
-        return redirect(url_for("show_login", message="Your account has been deleted.")), 302
+        return """
+        <mixhtml mix-redirect="/login?profile_deleted=Your account has been deleted."></mixhtml>
+        """, 200
 
     except Exception as ex:
-        return str(ex), 500
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 #search
