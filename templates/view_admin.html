@@ -19,14 +19,14 @@
 
                     <div id="user-actions-{{ user.user_pk }}">
                         {% if user.user_blocked_at == 0 %}
-                            <form mix-patch="/admin/block-user" method="post">
-                                <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
-                                <button class="btn block">Block</button>
+                            <form mix-patch="/admin/block-user">
+                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
+                            <button class="btn block" mix-await="Blocking..." mix-default="Block">Block {{ user.user_email }}</button>
                             </form>
                         {% else %}
-                            <form mix-patch="/admin/unblock-user" method="post">
-                                <input type="hidden" name="user_pk" value="{{ user.user_pk }}">
-                                <button class="btn unblock">Unblock</button>
+                            <form mix-patch="/admin/unblock-user">
+                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
+                            <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock {{ user.user_email }}</button>
                             </form>
                         {% endif %}
                     </div>
@@ -46,14 +46,14 @@
 
                 <div id="item-actions-{{ item.item_pk }}">
                     {% if item.item_blocked_at == 0 %}
-                        <form mix-patch="/admin/block-item" method="post">
-                            <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
-                            <button class="btn block">Block</button>
+                        <form mix-patch="/admin/block-item">
+                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}" mix-check="^\d+$" title="Invalid item ID">
+                        <button class="btn block" mix-await="Blocking..." mix-default="Block">Block {{ item.item_name }}</button>
                         </form>
                     {% else %}
-                        <form mix-patch="/admin/unblock-item" method="post">
-                            <input type="hidden" name="item_pk" value="{{ item.item_pk }}">
-                            <button class="btn unblock">Unblock</button>
+                        <form mix-patch="/admin/unblock-item">
+                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}" mix-check="^\d+$" title="Invalid item ID">
+                        <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock {{ item.item_name }}</button>
                         </form>
                     {% endif %}
                     <div class="item-feedback"></div>

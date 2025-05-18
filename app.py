@@ -760,26 +760,32 @@ def view_admin():
 @app.patch("/admin/block-user")
 def admin_block_user():
     try:
-        user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
+        try:
+            user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
+        except Exception as ex:
+            return f"""
+            <mixhtml mix-update=".user-feedback">
+              <div class='alert error'>{str(ex)}</div>
+            </mixhtml>
+            """, 400
 
         db, cursor = x.db()
 
-        q = "UPDATE users SET user_blocked_at = %s WHERE user_pk = %s"
-        cursor.execute(q, (int(time.time()), user_pk))
+        cursor.execute("UPDATE users SET user_blocked_at = %s WHERE user_pk = %s", (int(time.time()), user_pk))
         db.commit()
 
         button = f"""
         <div id="user-actions-{user_pk}">
-            <form mix-patch="/admin/unblock-user" method="post">
-                <input type="hidden" name="user_pk" value="{user_pk}">
-                <button class="btn unblock">Unblock</button>
+            <form mix-patch="/admin/unblock-user">
+                <input type="hidden" name="user_pk" value="{user_pk}" mix-check="^\d+$" title="Invalid user ID">
+                <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock</button>
             </form>
         </div>
         """
 
         message = f"""
         <div class='alert success' mix-ttl="3000">
-            User #{user_pk} has been blocked.
+            ✅ User #{user_pk} has been blocked.
         </div>
         """
 
@@ -790,40 +796,49 @@ def admin_block_user():
 
         return f"""
         <mixhtml mix-replace="#user-actions-{user_pk}">
-            {button}
+          {button}
         </mixhtml>
-
         <mixhtml mix-update="#user-card-{user_pk} .user-feedback">
-            {message}
+          {message}
         </mixhtml>
         """, 200
 
     except Exception as ex:
-        ic(ex)
-        return str(ex), 400
+        return f"""
+        <mixhtml mix-update=".user-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 #Unblock user
 @app.patch("/admin/unblock-user")
 def admin_unblock_user():
     try:
-        user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
+        try:
+            user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
+        except Exception as ex:
+            return f"""
+            <mixhtml mix-update=".user-feedback">
+              <div class='alert error'>{str(ex)}</div>
+            </mixhtml>
+            """, 400
 
         db, cursor = x.db()
 
-        q = "UPDATE users SET user_blocked_at = 0 WHERE user_pk = %s"
-        cursor.execute(q, (user_pk,))
+        cursor.execute("UPDATE users SET user_blocked_at = 0 WHERE user_pk = %s", (user_pk,))
         db.commit()
 
         button = f"""
         <div id="user-actions-{user_pk}">
-            <form mix-patch="/admin/block-user" method="post">
-                <input type="hidden" name="user_pk" value="{user_pk}">
-                <button class="btn block">Block</button>
+            <form mix-patch="/admin/block-user">
+                <input type="hidden" name="user_pk" value="{user_pk}" mix-check="^\d+$" title="Invalid user ID">
+                <button class="btn block" mix-await="Blocking..." mix-default="Block">Block</button>
             </form>
         </div>
         """
@@ -841,29 +856,37 @@ def admin_unblock_user():
 
         return f"""
         <mixhtml mix-replace="#user-actions-{user_pk}">
-            {button}
+          {button}
         </mixhtml>
-
         <mixhtml mix-update="#user-card-{user_pk} .user-feedback">
-            {message}
+          {message}
         </mixhtml>
         """, 200
 
     except Exception as ex:
-        ic(ex)
-        return str(ex), 400
+        return f"""
+        <mixhtml mix-update=".user-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
 
 ##############################
 #Block item
 @app.patch("/admin/block-item")
 def admin_block_item():
     try:
-        item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
+        try:
+            item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
+        except Exception as ex:
+            return f"""
+            <mixhtml mix-update=".item-feedback">
+              <div class='alert error'>{str(ex)}</div>
+            </mixhtml>
+            """, 400
 
         db, cursor = x.db()
 
@@ -872,9 +895,9 @@ def admin_block_item():
 
         button = f"""
         <div id="item-actions-{item_pk}">
-            <form mix-patch="/admin/unblock-item" method="post">
-                <input type="hidden" name="item_pk" value="{item_pk}">
-                <button class="btn unblock">Unblock</button>
+            <form mix-patch="/admin/unblock-item">
+                <input type="hidden" name="item_pk" value="{item_pk}" mix-check="^\d+$" title="Invalid item ID">
+                <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock</button>
             </form>
             <div class="item-feedback"></div>
         </div>
@@ -898,17 +921,19 @@ def admin_block_item():
 
         return f"""
         <mixhtml mix-replace="#item-actions-{item_pk}">
-            {button}
+          {button}
         </mixhtml>
-
         <mixhtml mix-update="#item-actions-{item_pk} .item-feedback">
-            {message}
+          {message}
         </mixhtml>
         """, 200
 
     except Exception as ex:
-        ic(ex)
-        return str(ex), 400
+        return f"""
+        <mixhtml mix-update=".item-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
@@ -919,17 +944,25 @@ def admin_block_item():
 @app.patch("/admin/unblock-item")
 def admin_unblock_item():
     try:
-        item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
+        try:
+            item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
+        except Exception as ex:
+            return f"""
+            <mixhtml mix-update=".item-feedback">
+              <div class='alert error'>{str(ex)}</div>
+            </mixhtml>
+            """, 400
 
         db, cursor = x.db()
+
         cursor.execute("UPDATE items SET item_blocked_at = 0 WHERE item_pk = %s", (item_pk,))
         db.commit()
 
         button = f"""
         <div id="item-actions-{item_pk}">
-            <form mix-patch="/admin/block-item" method="post">
-                <input type="hidden" name="item_pk" value="{item_pk}">
-                <button class="btn block">Block</button>
+            <form mix-patch="/admin/block-item">
+                <input type="hidden" name="item_pk" value="{item_pk}" mix-check="^\d+$" title="Invalid item ID">
+                <button class="btn block" mix-await="Blocking..." mix-default="Block">Block</button>
             </form>
             <div class="item-feedback"></div>
         </div>
@@ -953,22 +986,23 @@ def admin_unblock_item():
 
         return f"""
         <mixhtml mix-replace="#item-actions-{item_pk}">
-            {button}
+          {button}
         </mixhtml>
-
         <mixhtml mix-update="#item-actions-{item_pk} .item-feedback">
-            {message}
+          {message}
         </mixhtml>
         """, 200
 
     except Exception as ex:
-        ic(ex)
-        return str(ex), 400
+        return f"""
+        <mixhtml mix-update=".item-feedback">
+          <div class='alert error'>Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
 
 ##############################
 @app.get("/forgot-password")
