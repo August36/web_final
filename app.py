@@ -213,18 +213,18 @@ def post_item():
         blank_form_html = render_template("upload_item_form.html", form=None, errors=None)
 
         return f"""
-        <mixhtml mix-top="#items">
-          {item_html}
-        </mixhtml>
-
-        <mixhtml mix-update="#item-form">
-          {blank_form_html}
-        </mixhtml>
-
         <mixhtml mix-replace="#form-feedback">
         <div class='alert success' mix-ttl="3000">
             ✅ Spot uploaded successfully
         </div>
+        </mixhtml>
+
+        <mixhtml mix-update="#item-form">
+        {blank_form_html}
+        </mixhtml>
+
+        <mixhtml mix-top="#items">
+        {item_html}
         </mixhtml>
         """, 200
 
