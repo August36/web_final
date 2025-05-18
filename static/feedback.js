@@ -55,3 +55,11 @@ document.querySelectorAll("[mix-check]").forEach(input => {
     }
   });
 });
+
+function resetButtonText() {
+  const btn = document.querySelector('[mix-await]');
+  if (btn) {
+    btn.innerHTML = btn.getAttribute('mix-default');
+    btn.removeAttribute('disabled');
+  }
+}

@@ -6,6 +6,7 @@ import time
 import uuid
 import os
 import json
+import re
 
 from icecream import ic
 ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
@@ -980,6 +981,14 @@ def forgot_password():
     try:
         user_email = request.form.get("user_email", "").strip()
 
+        # Valider email med regex
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", user_email):
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class="alert error">Enter a valid email address.</div>
+            </mixhtml>
+            """, 400
+
         db, cursor = x.db()
         q = "SELECT * FROM users WHERE user_email = %s AND user_deleted_at = 0"
         cursor.execute(q, (user_email,))
@@ -998,22 +1007,27 @@ def forgot_password():
             db.commit()
             x.send_reset_email(user_email, reset_key)
 
-        return render_template(
-            "forgot_password.html",
-            message="If your email exists, we've sent a reset link.",
-            old_values={}
-        ), 200
+        return """
+        <mixhtml mix-update="#form-feedback">
+          <div class="alert success" mix-ttl="4000">
+            If your email exists, we've sent a reset link.
+          </div>
+        </mixhtml>
+        <mixhtml mix-function="resetButtonText">Send reset link</mixhtml>
+        """, 200
 
     except Exception as ex:
-        return render_template(
-            "forgot_password.html",
-            message="Something went wrong: " + str(ex),
-            old_values=request.form
-        ), 500
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class="alert error">Something went wrong: {str(ex)}</div>
+        </mixhtml>
+        <mixhtml mix-function="resetButtonText">Send reset link</mixhtml>
+        """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 @app.get("/reset-password/<reset_key>")
@@ -1027,12 +1041,12 @@ def reset_password(reset_key):
         try:
             new_password = x.validate_user_password()
         except Exception as ex:
-            return render_template(
-                "reset_password.html",
-                reset_key=reset_key,
-                message=str(ex),
-                user_password_error="input_error"
-            ), 400
+            return f"""
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>{str(ex)}</div>
+            </mixhtml>
+            <mixhtml mix-function="resetButtonText">Reset password</mixhtml>
+            """, 400
 
         db, cursor = x.db()
 
@@ -1041,17 +1055,19 @@ def reset_password(reset_key):
         user = cursor.fetchone()
 
         if not user:
-            return render_template(
-                "reset_password.html",
-                message="Invalid or expired reset link"
-            ), 403
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Invalid or expired reset link.</div>
+            </mixhtml>
+            """, 403
 
         now = int(time.time())
         if user["user_reset_requested_at"] < now - 3600:
-            return render_template(
-                "reset_password.html",
-                message="Reset link has expired. Please request a new one."
-            ), 403
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Reset link has expired. Please request a new one.</div>
+            </mixhtml>
+            """, 403
 
         hashed = generate_password_hash(new_password)
 
@@ -1065,25 +1081,31 @@ def reset_password(reset_key):
         cursor.execute(q, (hashed, reset_key))
 
         if cursor.rowcount != 1:
-            return render_template(
-                "reset_password.html",
-                reset_key=reset_key,
-                message="Invalid or expired reset link",
-                user_password_error="input_error"
-            ), 403
+            return """
+            <mixhtml mix-update="#form-feedback">
+              <div class='alert error'>Invalid or expired reset link.</div>
+            </mixhtml>
+            <mixhtml mix-function="resetButtonText">Reset password</mixhtml>
+            """, 403
 
         db.commit()
-        return render_template(
-            "login.html",
-            message="Password updated. You can now log in."
-        ), 200
+
+        return """
+        <mixhtml mix-redirect="/login?message=Password updated. You can now log in."></mixhtml>
+        """, 200
 
     except Exception as ex:
-        return f"Site under maintenance: {ex}", 500
+        return f"""
+        <mixhtml mix-update="#form-feedback">
+          <div class='alert error'>Site under maintenance: {str(ex)}</div>
+        </mixhtml>
+        <mixhtml mix-function="resetButtonText">Reset password</mixhtml>
+        """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 @app.get("/profile")
