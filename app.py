@@ -21,6 +21,18 @@ def before_request():
     g.is_session = "user" in session
 
 ##############################
+@app.get("/rates")
+def get_rates():
+    try:
+        data = requests.get("https://api.exchangerate-api.com/v4/latest/usd")
+        ic(data.json())
+        with open("rates.txt", "w") as file:
+            file.write(data.text)
+        return data.json()
+    except Exception as ex:
+        ic(ex)
+
+##############################
 @app.after_request
 def disable_cache(response):
     """
