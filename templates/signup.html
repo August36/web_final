@@ -4,13 +4,13 @@
 <main>
   <h1>{{ error_message }}</h1>
 
-  <form mix-post="/signup" method="post">
+  <form mix-post="/signup/{{ lan }}" method="post">
     <input 
       class="input"
       name="user_username"
       type="text"
-      placeholder="Username"
-      title="Username must be between 2 and 20 characters, letters and numbers only"
+      placeholder="{{ languages[lan~'_signup_username_placeholder'] }}"
+      title="{{ languages[lan~'_signup_username_title'] }}"
       value="{{ old_values.get('user_username', '') }}"
       mix-check="^[a-zA-Z0-9_]{2,20}$"
     >
@@ -19,8 +19,8 @@
       class="input"
       name="user_name"
       type="text"
-      placeholder="First name"
-      title="First name must be between 2 and 20 characters, letters only"
+      placeholder="{{ languages[lan~'_signup_firstname_placeholder'] }}"
+      title="{{ languages[lan~'_signup_first_name_title'] }}"
       value="{{ old_values.get('user_name', '') }}"
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
     >
@@ -29,8 +29,8 @@
       class="input"
       name="user_last_name"
       type="text"
-      placeholder="Last name"
-      title="Last name must be between 2 and 20 characters, letters only"
+      placeholder="{{ languages[lan~'_signup_lastname_placeholder'] }}"
+      title="{{ languages[lan~'_signup_last_name_title'] }}"
       value="{{ old_values.get('user_last_name', '') }}"
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
     >
@@ -39,8 +39,8 @@
       class="input"
       name="user_email"
       type="text"
-      placeholder="Email"
-      title="Enter a valid email (e.g. test@example.com)"
+      placeholder="{{ languages[lan~'_signup_email_placeholder'] }}"
+      title="{{ languages[lan~'_signup_email_title'] }}"
       value="{{ old_values.get('user_email', '') }}"
       mix-check="^[^@]+@[^@]+\.[^@]+$"
     >
@@ -49,18 +49,18 @@
       class="input"
       name="user_password"
       type="password"
-      placeholder="Password"
-      title="Password must be between 2 and 20 characters"
+      placeholder="{{ languages[lan~'_signup_password_placeholder'] }}"
+      title="{{ languages[lan~'_signup_password_title'] }}"
       value="{{ old_values.get('user_password', '') }}"
       mix-check="^.{2,20}$"
     >
 
     <button 
       class="btn" 
-      mix-await="Signing up..." 
-      mix-default="Signup"
+      mix-await="{{ languages[lan~'_signup_button_await'] }}" 
+      mix-default="{{ languages[lan~'_signup_button_default'] }}"
     >
-      Signup
+      {{ languages[lan~'_signup_button_default'] }}
     </button>
   </form>
 

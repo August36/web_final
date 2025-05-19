@@ -23,6 +23,7 @@ def before_request():
     g.is_session = "user" in session
 
 ##############################
+# ***rates***
 @app.get("/rates")
 def get_rates():
     try:
@@ -56,6 +57,7 @@ def disable_cache(response):
     return response
 
 ##############################
+# ***index***
 @app.get("/")
 def view_index():
     try:
@@ -99,6 +101,7 @@ def view_index():
 
 
 ##############################
+# ***item get***
 @app.get("/items/<item_pk>")
 def get_item_by_pk(item_pk):
     try:
@@ -139,6 +142,7 @@ def get_item_by_pk(item_pk):
         if "db" in locals(): db.close()
 
 ##############################
+# ***item pagination***
 @app.get("/items/page/<page_number>")
 def get_items_by_page(page_number):
     try:
@@ -210,6 +214,7 @@ def get_items_by_page(page_number):
         if "db" in locals(): db.close()
 
 ##############################
+# ***item post***
 @app.post("/item")
 def post_item():
     try:
@@ -349,7 +354,7 @@ def post_item():
         if "db" in locals(): db.close()
 
 ##############################
-#Edit item
+# ***item edit post***
 @app.post("/items/<item_pk>")
 def edit_item_post(item_pk):
     try:
@@ -432,7 +437,7 @@ def edit_item_post(item_pk):
         if "db" in locals(): db.close()
 
 ##############################
-#Edit spot/item page
+# ***item edit get***
 @app.get("/items/<item_pk>/edit")
 def edit_item_page(item_pk):
     try:
@@ -459,7 +464,7 @@ def edit_item_page(item_pk):
         if "db" in locals(): db.close()
 
 ##############################
-#Delete image
+# ***image delete***
 @app.delete("/images/<image_pk>")
 def delete_image(image_pk):
     try:
@@ -490,7 +495,7 @@ def delete_image(image_pk):
 
 
 ##############################
-# DELETE CARD
+# ***item delete***
 @app.delete("/items/<item_pk>")
 def delete_item(item_pk):
     try:
@@ -528,23 +533,38 @@ def delete_item(item_pk):
 
 
 ##############################
+# ***signup get***
 @app.get("/signup")
-def show_signup():
-    active_signup = "active"
-    error_message = request.args.get("error_message", "")
-    return render_template(
-        "signup.html",
-        title="signup",
-        active_signup=active_signup,
-        error_message=error_message,
-        old_values={}
-    ), 200
+@app.get("/signup/<lan>")
+def show_signup(lan="en"):
+    try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
+        active_signup = "active"
+        error_message = request.args.get("error_message", "")
+        return render_template(
+            "signup.html",
+            title="Signup",
+            active_signup=active_signup,
+            error_message=error_message,
+            old_values={},
+            lan=lan,
+            languages=languages
+        ), 200
+    except Exception as ex:
+        return str(ex), 500
+
 
 
 ##############################
-@app.post("/signup")
-def signup():
+# ***signup post***
+@app.post("/signup/<lan>")
+def signup(lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user_username  = x.validate_user_username()
         user_name      = x.validate_user_name()
         user_last_name = x.validate_user_last_name()
@@ -562,7 +582,6 @@ def signup():
          user_verified, user_verification_key) 
         VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-
         db, cursor = x.db()
         cursor.execute(q, (
             user_username, user_name, user_last_name,
@@ -576,8 +595,8 @@ def signup():
         db.commit()
         x.send_email(user_name, user_last_name, user_email, verification_key)
 
-        return """
-        <mixhtml mix-redirect='/login?message=Thank you for signing up. Please verify your email before logging in.'></mixhtml>
+        return f"""
+        <mixhtml mix-redirect='/login/{lan}?message={getattr(languages, f"{lan}_signup_success")}'></mixhtml>
         """, 200
 
     except Exception as ex:
@@ -585,57 +604,57 @@ def signup():
         if "db" in locals(): db.rollback()
 
         if "username" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Brugernavn skal være 2–20 tegn og må ikke være i brug.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_username_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "first name" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Fornavn skal være 2–20 tegn.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_first_name_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "last name" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Efternavn skal være 2–20 tegn.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_last_name_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "Invalid email" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Ugyldig email.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_email_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "password" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Password skal være 2–20 tegn.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_password_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "user_email" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Denne email er allerede i brug.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_email_exists")}</div>
             </mixhtml>
             """, 400
 
         if "user_username" in str(ex):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Dette brugernavn er allerede i brug.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_signup_username_exists")}</div>
             </mixhtml>
             """, 400
 
         return f"""
         <mixhtml mix-update="#form-feedback">
-          <div class='alert error'>Ukendt fejl: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f"{lan}_signup_unknown_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 400
 
@@ -645,42 +664,7 @@ def signup():
 
 
 ##############################
-@app.get("/verify/<verification_key>")
-def verify_user(verification_key):
-    try:
-        verification_key = x.validate_verification_key(verification_key)
-
-        db, cursor = x.db()
-
-        # Tjek om en bruger med denne nøgle findes og ikke allerede er verificeret
-        q = "SELECT * FROM users WHERE user_verification_key = %s AND user_verified = 0"
-        cursor.execute(q, (verification_key,))
-        user = cursor.fetchone()
-
-        if not user:
-            return "Verification key is invalid or already in use", 400
-
-        # Opdater brugeren til at være verificeret og slet nøglen
-        q = """
-        UPDATE users
-        SET user_verified = 1,
-            user_verification_key = NULL
-        WHERE user_verification_key = %s
-        """
-        cursor.execute(q, (verification_key,))
-        db.commit()
-
-        return render_template("login.html", message="Your email is now verified. You can log in."), 200
-
-    except Exception as ex:
-        return str(ex), 500
-
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-
-
-##############################
+# ***login get***
 @app.get("/login")
 @app.get("/login/<lan>")
 def show_login(lan="en"):
@@ -703,6 +687,7 @@ def show_login(lan="en"):
 
 
 ##############################
+# ***login post***
 @app.post("/login/<lan>")
 def login(lan):
     languages_allowed = ["en", "dk"]
@@ -757,18 +742,15 @@ def login(lan):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
-
-
 ##############################
+# ***logout get***
 @app.get("/logout")
 def logout():
     session.pop("user")
     return redirect(url_for("show_login")), 302
 
-
 ##############################
-#Admin
+# ***admin get***
 @app.get("/admin")
 def view_admin():
     try:
@@ -801,7 +783,7 @@ def view_admin():
         if "db" in locals(): db.close()
 
 ##############################
-#Block user med form
+# ***admin block user***
 @app.patch("/admin/block-user")
 def admin_block_user():
     try:
@@ -859,9 +841,8 @@ def admin_block_user():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
-#Unblock user
+# ***admin unblock user***
 @app.patch("/admin/unblock-user")
 def admin_unblock_user():
     try:
@@ -920,7 +901,7 @@ def admin_unblock_user():
         if "db" in locals(): db.close()
 
 ##############################
-#Block item
+# ***admin block item***
 @app.patch("/admin/block-item")
 def admin_block_item():
     try:
@@ -985,7 +966,7 @@ def admin_block_item():
         if "db" in locals(): db.close()
 
 ##############################
-#Unblock item
+# ***admin unblock item***
 @app.patch("/admin/unblock-item")
 def admin_unblock_item():
     try:
@@ -1050,11 +1031,13 @@ def admin_unblock_item():
         if "db" in locals(): db.close()
 
 ##############################
+# ***forgot password get***
 @app.get("/forgot-password")
 def show_forgot_password():
     return render_template("forgot_password.html", old_values={}), 200
 
 ##############################
+# ***forgot password post***
 @app.post("/forgot-password")
 def forgot_password():
     try:
@@ -1107,13 +1090,50 @@ def forgot_password():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+##############################
+# ***verify get***
+@app.get("/verify/<verification_key>")
+def verify_user(verification_key):
+    try:
+        verification_key = x.validate_verification_key(verification_key)
+
+        db, cursor = x.db()
+
+        # Tjek om en bruger med denne nøgle findes og ikke allerede er verificeret
+        q = "SELECT * FROM users WHERE user_verification_key = %s AND user_verified = 0"
+        cursor.execute(q, (verification_key,))
+        user = cursor.fetchone()
+
+        if not user:
+            return "Verification key is invalid or already in use", 400
+
+        # Opdater brugeren til at være verificeret og slet nøglen
+        q = """
+        UPDATE users
+        SET user_verified = 1,
+            user_verification_key = NULL
+        WHERE user_verification_key = %s
+        """
+        cursor.execute(q, (verification_key,))
+        db.commit()
+
+        return render_template("login.html", message="Your email is now verified. You can log in."), 200
+
+    except Exception as ex:
+        return str(ex), 500
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
+# ***reset password get***
 @app.get("/reset-password/<reset_key>")
 def show_reset_form(reset_key):
     return render_template("reset_password.html", reset_key=reset_key), 200
 
 ##############################
+# ***reset password post***
 @app.post("/reset-password/<reset_key>")
 def reset_password(reset_key):
     try:
@@ -1187,6 +1207,7 @@ def reset_password(reset_key):
 
 
 ##############################
+# ***profile get***
 @app.get("/profile")
 def profile():
     try:
@@ -1231,9 +1252,9 @@ def profile():
 
 
 ##############################
+# ***profile edit get***
 @app.get("/profile/edit")
 def edit_profile():
-#edit_profile get
     try:
         if "user" not in session:
             return redirect(url_for("show_login")), 302
@@ -1250,7 +1271,7 @@ def edit_profile():
         return str(ex), 500
 
 ##############################
-#edit_profile
+# ***profile edit post***
 @app.post("/profile/edit")
 def update_profile():
     try:
@@ -1328,6 +1349,7 @@ def update_profile():
 
 
 ##############################
+# ***profile delete get***
 @app.get("/profile/delete")
 def delete_profile():
     if "user" not in session:
@@ -1341,6 +1363,7 @@ def delete_profile():
     ), 200
 
 ##############################
+# ***profile delete post***
 @app.post("/profile/delete")
 def confirm_delete_profile():
     try:
@@ -1389,7 +1412,7 @@ def confirm_delete_profile():
 
 
 ##############################
-#search
+# ***search get***
 @app.get("/search")
 def search():
     try:
