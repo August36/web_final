@@ -342,6 +342,69 @@ dk_profile_item_error = "Noget gik galt: {str(ex)}"
 en_profile_item_deleted = "✅ Spot deleted successfully"
 dk_profile_item_deleted = "✅ Spot er blevet slettet"
 
+# ------------------------
+# Admin
+# ------------------------
+
+en_admin_title_users = "Users"
+dk_admin_title_users = "Brugere"
+
+en_admin_title_items = "Items"
+dk_admin_title_items = "Spots"
+
+en_user_id = "User ID:"
+dk_user_id = "Bruger ID:"
+
+en_admin_user_fk = "User FK:"
+dk_admin_user_fk = "Bruger FK:"
+
+en_admin_blocked = "Blocked:"
+dk_admin_blocked = "Blokeret:"
+
+en_admin_admin = "Admin:"
+dk_admin_admin = "Administrator:"
+
+en_admin_yes = "Yes"
+dk_admin_yes = "Ja"
+
+en_admin_no = "No"
+dk_admin_no = "Nej"
+
+en_admin_block_button_default = "Block"
+dk_admin_block_button_default = "Blokér"
+
+en_admin_block_button_await = "Blocking..."
+dk_admin_block_button_await = "Blokerer..."
+
+en_admin_unblock_button_default = "Unblock"
+dk_admin_unblock_button_default = "Fjern blokering"
+
+en_admin_unblock_button_await = "Unblocking..."
+dk_admin_unblock_button_await = "Fjerner blokering..."
+
+en_admin_only = "You must be an admin."
+dk_admin_only = "Du skal være administrator."
+
+en_admin_block_user_error = "Something went wrong: {str(ex)}"
+dk_admin_block_user_error = "Noget gik galt: {str(ex)}"
+
+en_admin_invalid_user_id = "Invalid user ID"
+dk_admin_invalid_user_id = "Ugyldigt bruger-ID"
+
+en_admin_user_blocked = "✅ User #{user_pk} has been blocked."
+dk_admin_user_blocked = "✅ Bruger #{user_pk} er blevet blokeret."
+
+en_admin_user_unblocked = "✅ User #{user_pk} has been unblocked."
+dk_admin_user_unblocked = "✅ Bruger #{user_pk} er blevet fjernet fra blokering."
+
+en_admin_item_blocked = "✅ Spot #{item_pk} has been blocked."
+dk_admin_item_blocked = "✅ Spot #{item_pk} er blevet blokeret."
+
+en_admin_item_unblocked = "✅ Item #{item_pk} has been unblocked."
+dk_admin_item_unblocked = "✅ Spot #{item_pk} er blevet fjernet fra blokering."
+
+
+
 
 
 

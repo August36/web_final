@@ -782,12 +782,19 @@ def logout():
 ##############################
 # ***admin get***
 @app.get("/admin")
-def view_admin():
+@app.get("/admin/<lan>")
+def view_admin(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed:
+            lan = "en"
+
         if not session.get("user") or not session["user"].get("user_is_admin"):
             return render_template(
                 "login.html",
-                message="You must be an admin."
+                message=getattr(languages, f"{lan}_admin_only"),
+                lan=lan,
+                languages=languages
             ), 403
 
         db, cursor = x.db()
@@ -801,7 +808,9 @@ def view_admin():
         return render_template(
             "view_admin.html",
             users=users,
-            items=items
+            items=items,
+            lan=lan,
+            languages=languages
         ), 200
 
     except Exception as ex:
@@ -812,11 +821,16 @@ def view_admin():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***admin block user***
 @app.patch("/admin/block-user")
-def admin_block_user():
+@app.patch("/admin/block-user/<lan>")
+def admin_block_user(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         try:
             user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
         except Exception as ex:
@@ -833,16 +847,20 @@ def admin_block_user():
 
         button = f"""
         <div id="user-actions-{user_pk}">
-            <form mix-patch="/admin/unblock-user">
-                <input type="hidden" name="user_pk" value="{user_pk}" mix-check="^\d+$" title="Invalid user ID">
-                <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock</button>
+            <form mix-patch="/admin/unblock-user/{lan}">
+                <input type="hidden" name="user_pk" value="{user_pk}" mix-check="^\d+$" title="{getattr(languages, f'{lan}_admin_invalid_user_id')}">
+                <button class="btn unblock"
+                        mix-await="{getattr(languages, f'{lan}_admin_unblock_button_await')}"
+                        mix-default="{getattr(languages, f'{lan}_admin_unblock_button_default')}">
+                    {getattr(languages, f'{lan}_admin_unblock_button_default')}
+                </button>
             </form>
         </div>
         """
 
         message = f"""
         <div class='alert success' mix-ttl="3000">
-            ✅ User #{user_pk} has been blocked.
+            {getattr(languages, f"{lan}_admin_user_blocked").replace("{user_pk}", str(user_pk))}
         </div>
         """
 
@@ -863,7 +881,7 @@ def admin_block_user():
     except Exception as ex:
         return f"""
         <mixhtml mix-update=".user-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f'{lan}_admin_block_user_error').replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 400
 
@@ -871,11 +889,16 @@ def admin_block_user():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***admin unblock user***
 @app.patch("/admin/unblock-user")
-def admin_unblock_user():
+@app.patch("/admin/unblock-user/<lan>")
+def admin_unblock_user(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         try:
             user_pk = x.validate_user_pk(request.form.get("user_pk", ""))
         except Exception as ex:
@@ -886,22 +909,27 @@ def admin_unblock_user():
             """, 400
 
         db, cursor = x.db()
-
         cursor.execute("UPDATE users SET user_blocked_at = 0 WHERE user_pk = %s", (user_pk,))
         db.commit()
 
         button = f"""
         <div id="user-actions-{user_pk}">
-            <form mix-patch="/admin/block-user">
-                <input type="hidden" name="user_pk" value="{user_pk}" mix-check="^\d+$" title="Invalid user ID">
-                <button class="btn block" mix-await="Blocking..." mix-default="Block">Block</button>
+            <form mix-patch="/admin/block-user/{lan}">
+                <input type="hidden" name="user_pk" value="{user_pk}" 
+                       mix-check="^\d+$" 
+                       title="{getattr(languages, f'{lan}_admin_invalid_user_id')}">
+                <button class="btn block"
+                        mix-await="{getattr(languages, f'{lan}_admin_block_button_await')}"
+                        mix-default="{getattr(languages, f'{lan}_admin_block_button_default')}">
+                  {getattr(languages, f'{lan}_admin_block_button_default')}
+                </button>
             </form>
         </div>
         """
 
         message = f"""
         <div class='alert success' mix-ttl="3000">
-            ✅ User #{user_pk} has been unblocked.
+          {getattr(languages, f'{lan}_admin_user_unblocked').replace("{user_pk}", str(user_pk))}
         </div>
         """
 
@@ -922,7 +950,7 @@ def admin_unblock_user():
     except Exception as ex:
         return f"""
         <mixhtml mix-update=".user-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f'{lan}_admin_block_user_error').replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 400
 
@@ -930,11 +958,16 @@ def admin_unblock_user():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***admin block item***
 @app.patch("/admin/block-item")
-def admin_block_item():
+@app.patch("/admin/block-item/<lan>")
+def admin_block_item(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         try:
             item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
         except Exception as ex:
@@ -951,9 +984,15 @@ def admin_block_item():
 
         button = f"""
         <div id="item-actions-{item_pk}">
-            <form mix-patch="/admin/unblock-item">
-                <input type="hidden" name="item_pk" value="{item_pk}" mix-check="^\d+$" title="Invalid item ID">
-                <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock</button>
+            <form mix-patch="/admin/unblock-item/{lan}">
+                <input type="hidden" name="item_pk" value="{item_pk}"
+                       mix-check="^\d+$"
+                       title="{getattr(languages, f'{lan}_admin_invalid_user_id')}">
+                <button class="btn unblock"
+                        mix-await="{getattr(languages, f'{lan}_admin_unblock_button_await')}"
+                        mix-default="{getattr(languages, f'{lan}_admin_unblock_button_default')}">
+                    {getattr(languages, f'{lan}_admin_unblock_button_default')}
+                </button>
             </form>
             <div class="item-feedback"></div>
         </div>
@@ -961,7 +1000,7 @@ def admin_block_item():
 
         message = f"""
         <div class='alert success' mix-ttl="3000">
-            ✅ Item #{item_pk} has been blocked.
+            {getattr(languages, f'{lan}_admin_item_blocked').replace("{item_pk}", str(item_pk))}
         </div>
         """
 
@@ -987,7 +1026,7 @@ def admin_block_item():
     except Exception as ex:
         return f"""
         <mixhtml mix-update=".item-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f'{lan}_admin_block_user_error').replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 400
 
@@ -995,11 +1034,16 @@ def admin_block_item():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***admin unblock item***
 @app.patch("/admin/unblock-item")
-def admin_unblock_item():
+@app.patch("/admin/unblock-item/<lan>")
+def admin_unblock_item(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         try:
             item_pk = x.validate_item_pk(request.form.get("item_pk", ""))
         except Exception as ex:
@@ -1016,9 +1060,15 @@ def admin_unblock_item():
 
         button = f"""
         <div id="item-actions-{item_pk}">
-            <form mix-patch="/admin/block-item">
-                <input type="hidden" name="item_pk" value="{item_pk}" mix-check="^\d+$" title="Invalid item ID">
-                <button class="btn block" mix-await="Blocking..." mix-default="Block">Block</button>
+            <form mix-patch="/admin/block-item/{lan}">
+                <input type="hidden" name="item_pk" value="{item_pk}"
+                       mix-check="^\d+$"
+                       title="{getattr(languages, f'{lan}_admin_invalid_user_id')}">
+                <button class="btn block"
+                        mix-await="{getattr(languages, f'{lan}_admin_block_button_await')}"
+                        mix-default="{getattr(languages, f'{lan}_admin_block_button_default')}">
+                    {getattr(languages, f'{lan}_admin_block_button_default')}
+                </button>
             </form>
             <div class="item-feedback"></div>
         </div>
@@ -1026,7 +1076,7 @@ def admin_unblock_item():
 
         message = f"""
         <div class='alert success' mix-ttl="3000">
-            ✅ Item #{item_pk} has been unblocked.
+          {getattr(languages, f'{lan}_admin_item_unblocked').replace("{item_pk}", str(item_pk))}
         </div>
         """
 
@@ -1052,13 +1102,14 @@ def admin_unblock_item():
     except Exception as ex:
         return f"""
         <mixhtml mix-update=".item-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f'{lan}_admin_block_user_error').replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 400
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 # ***forgot password get***

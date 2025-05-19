@@ -1,67 +1,79 @@
 {% include "_header.html" %}
 {% include "_nav.html" %}
 
-    <section class="admin-users">
-        <h2>Users</h2>
-        <div class="user-list">
-            {% for user in users %}
-                <div class="user-card" id="user-card-{{ user.user_pk }}">
-                    <p><strong>ID:</strong> {{ user.user_pk }}</p>
-                    <p><strong>Name:</strong> {{ user.user_username }}</p>
-                    <p><strong>Email:</strong> {{ user.user_email }}</p>
-                    <p><strong>Admin:</strong> {{ "Yes" if user.user_is_admin else "No" }}</p>
-                    <p><strong>Blocked:</strong> {{ "Yes" if user.user_blocked_at != 0 else "No" }}</p>
-                    <div class="user-feedback"></div>
+<main>
+  <section class="admin-users">
+    <h2>{{ languages[lan~'_admin_title_users'] }}</h2>
+    <div class="user-list">
+      {% for user in users %}
+        <div class="user-card" id="user-card-{{ user.user_pk }}">
+          <p><strong>{{ languages[lan~'_user_id'] }}</strong> {{ user.user_pk }}</p>
+          <p><strong>{{ languages[lan~'_dry_name'] }}</strong> {{ user.user_username }}</p>
+          <p><strong>{{ languages[lan~'_dry_email'] }}</strong> {{ user.user_email }}</p>
+          <p><strong>{{ languages[lan~'_admin_admin'] }}</strong> {{ languages[lan~'_admin_yes'] if user.user_is_admin else languages[lan~'_admin_no'] }}</p>
+          <p><strong>{{ languages[lan~'_admin_blocked'] }}</strong> {{ languages[lan~'_admin_yes'] if user.user_blocked_at != 0 else languages[lan~'_admin_no'] }}</p>
 
-
-                   <!-- # Bruger form til mix-patch, i stedet for buttons(som i undervisningskoden), for at kunne sende user_pk sikkert som et hidden input,
-                    og for nemmere at kunne udvide senere, hvis nødvendigt. # -->
-
-                    <div id="user-actions-{{ user.user_pk }}">
-                        {% if user.user_blocked_at == 0 %}
-                            <form mix-patch="/admin/block-user">
-                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
-                            <button class="btn block" mix-await="Blocking..." mix-default="Block">Block {{ user.user_email }}</button>
-                            </form>
-                        {% else %}
-                            <form mix-patch="/admin/unblock-user">
-                            <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
-                            <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock {{ user.user_email }}</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
+          <div id="user-actions-{{ user.user_pk }}">
+            {% if user.user_blocked_at == 0 %}
+              <form mix-patch="/admin/block-user">
+                <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
+                <button class="btn block"
+                        mix-await="{{ languages[lan~'_admin_block_button_await'] }}"
+                        mix-default="{{ languages[lan~'_admin_block_button_default'] }}">
+                  {{ languages[lan~'_admin_block_button_default'] }} {{ user.user_email }}
+                </button>
+              </form>
+            {% else %}
+              <form mix-patch="/admin/unblock-user">
+                <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
+                <button class="btn unblock"
+                        mix-await="{{ languages[lan~'_admin_unblock_button_await'] }}"
+                        mix-default="{{ languages[lan~'_admin_unblock_button_default'] }}">
+                  {{ languages[lan~'_admin_unblock_button_default'] }} {{ user.user_email }}
+                </button>
+              </form>
+            {% endif %}
+          </div>
         </div>
-    </section>
+      {% endfor %}
+    </div>
+  </section>
 
-    <section id="items">
-        <h2>Items</h2>
-        {% for item in items %}
-            <div class="item-card" id="item-card-{{ item.item_pk }}">
-                <p><strong>ID:</strong> {{ item.item_pk }}</p>
-                <p><strong>Name:</strong> {{ item.item_name }}</p>
-                <p><strong>User FK:</strong> {{ item.item_user_fk }}</p>
-                <p><strong>Blocked:</strong> {{ "Yes" if item.item_blocked_at != 0 else "No" }}</p>
+  <section id="items">
+    <h2>{{ languages[lan~'_admin_title_items'] }}</h2>
+    {% for item in items %}
+      <div class="item-card" id="item-card-{{ item.item_pk }}">
+        <p><strong>Spot ID:</strong> {{ item.item_pk }}</p>
+        <p><strong>{{ languages[lan~'_dry_name'] }}</strong> {{ item.item_name }}</p>
+        <p><strong>{{ languages[lan~'_admin_user_fk'] }}</strong> {{ item.item_user_fk }}</p>
+        <p><strong>{{ languages[lan~'_admin_blocked'] }}</strong> {{ languages[lan~'_admin_yes'] if item.item_blocked_at != 0 else languages[lan~'_admin_no'] }}</p>
 
-                <div id="item-actions-{{ item.item_pk }}">
-                    {% if item.item_blocked_at == 0 %}
-                        <form mix-patch="/admin/block-item">
-                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}" mix-check="^\d+$" title="Invalid item ID">
-                        <button class="btn block" mix-await="Blocking..." mix-default="Block">Block {{ item.item_name }}</button>
-                        </form>
-                    {% else %}
-                        <form mix-patch="/admin/unblock-item">
-                        <input type="hidden" name="item_pk" value="{{ item.item_pk }}" mix-check="^\d+$" title="Invalid item ID">
-                        <button class="btn unblock" mix-await="Unblocking..." mix-default="Unblock">Unblock {{ item.item_name }}</button>
-                        </form>
-                    {% endif %}
-                    <div class="item-feedback"></div>
-                </div>
-            </div>
-        {% endfor %}
-    </section>
-
+        <div id="item-actions-{{ item.item_pk }}">
+          {% if item.item_blocked_at == 0 %}
+            <form mix-patch="/admin/block-item">
+              <input type="hidden" name="item_pk" value="{{ item.item_pk }}" mix-check="^\d+$" title="Invalid item ID">
+              <button class="btn block"
+                      mix-await="{{ languages[lan~'_admin_block_button_await'] }}"
+                      mix-default="{{ languages[lan~'_admin_block_button_default'] }}">
+                {{ languages[lan~'_admin_block_button_default'] }} {{ item.item_name }}
+              </button>
+            </form>
+          {% else %}
+            <form mix-patch="/admin/unblock-item">
+              <input type="hidden" name="item_pk" value="{{ item.item_pk }}" mix-check="^\d+$" title="Invalid item ID">
+              <button class="btn unblock"
+                      mix-await="{{ languages[lan~'_admin_unblock_button_await'] }}"
+                      mix-default="{{ languages[lan~'_admin_unblock_button_default'] }}">
+                {{ languages[lan~'_admin_unblock_button_default'] }} {{ item.item_name }}
+              </button>
+            </form>
+          {% endif %}
+          <div class="item-feedback"></div>
+        </div>
+      </div>
+    {% endfor %}
+  </section>
 </main>
+
 
 {% include "_footer_base.html" %}
