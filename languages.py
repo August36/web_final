@@ -403,7 +403,36 @@ dk_admin_item_blocked = "✅ Spot #{item_pk} er blevet blokeret."
 en_admin_item_unblocked = "✅ Item #{item_pk} has been unblocked."
 dk_admin_item_unblocked = "✅ Spot #{item_pk} er blevet fjernet fra blokering."
 
+# ------------------------
+# Reset password
+# ------------------------
 
+en_reset_password_title = "Reset your password"
+dk_reset_password_title = "Nulstil din adgangskode"
+
+en_reset_password_button_default = "Reset password"
+dk_reset_password_button_default = "Nulstil adgangskode"
+
+en_reset_password_title = "Reset your password"
+dk_reset_password_title = "Nulstil din adgangskode"
+
+en_reset_password_button_default = "Reset password"
+dk_reset_password_button_default = "Nulstil adgangskode"
+
+en_reset_password_button_await = "Resetting..."
+dk_reset_password_button_await = "Nulstiller..."
+
+en_reset_password_invalid = "Invalid or expired reset link."
+dk_reset_password_invalid = "Ugyldigt eller udløbet nulstillingslink."
+
+en_reset_password_expired = "Reset link has expired. Please request a new one."
+dk_reset_password_expired = "Nulstillingslinket er udløbet. Anmod om et nyt."
+
+en_reset_password_success = "Password updated. You can now log in."
+dk_reset_password_success = "Adgangskode opdateret. Du kan nu logge ind."
+
+en_reset_password_error = "Site under maintenance: {str(ex)}"
+dk_reset_password_error = "Siden er midlertidigt utilgængelig: {str(ex)}"
 
 
 

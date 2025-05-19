@@ -1210,13 +1210,26 @@ def verify_user(verification_key):
 ##############################
 # ***reset password get***
 @app.get("/reset-password/<reset_key>")
-def show_reset_form(reset_key):
-    return render_template("reset_password.html", reset_key=reset_key), 200
+@app.get("/reset-password/<reset_key>/<lan>")
+def show_reset_form(reset_key, lan="en"):
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+
+    return render_template(
+        "reset_password.html",
+        reset_key=reset_key,
+        lan=lan,
+        languages=languages
+    ), 200
 
 ##############################
 # ***reset password post***
 @app.post("/reset-password/<reset_key>")
-def reset_password(reset_key):
+@app.post("/reset-password/<reset_key>/<lan>")
+def reset_password(reset_key, lan="en"):
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+
     try:
         try:
             new_password = x.validate_user_password()
@@ -1225,7 +1238,9 @@ def reset_password(reset_key):
             <mixhtml mix-update="#form-feedback">
               <div class='alert error'>{str(ex)}</div>
             </mixhtml>
-            <mixhtml mix-function="resetButtonText">Reset password</mixhtml>
+            <mixhtml mix-function="resetButtonText">
+              {getattr(languages, f'{lan}_reset_password_button_default')}
+            </mixhtml>
             """, 400
 
         db, cursor = x.db()
@@ -1235,17 +1250,17 @@ def reset_password(reset_key):
         user = cursor.fetchone()
 
         if not user:
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Invalid or expired reset link.</div>
+              <div class='alert error'>{getattr(languages, f'{lan}_reset_password_invalid')}</div>
             </mixhtml>
             """, 403
 
         now = int(time.time())
         if user["user_reset_requested_at"] < now - 3600:
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Reset link has expired. Please request a new one.</div>
+              <div class='alert error'>{getattr(languages, f'{lan}_reset_password_expired')}</div>
             </mixhtml>
             """, 403
 
@@ -1261,25 +1276,29 @@ def reset_password(reset_key):
         cursor.execute(q, (hashed, reset_key))
 
         if cursor.rowcount != 1:
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Invalid or expired reset link.</div>
+              <div class='alert error'>{getattr(languages, f'{lan}_reset_password_invalid')}</div>
             </mixhtml>
-            <mixhtml mix-function="resetButtonText">Reset password</mixhtml>
+            <mixhtml mix-function="resetButtonText">
+              {getattr(languages, f'{lan}_reset_password_button_default')}
+            </mixhtml>
             """, 403
 
         db.commit()
 
-        return """
-        <mixhtml mix-redirect="/login?message=Password updated. You can now log in."></mixhtml>
+        return f"""
+        <mixhtml mix-redirect="/login?message={getattr(languages, f'{lan}_reset_password_success')}"></mixhtml>
         """, 200
 
     except Exception as ex:
         return f"""
         <mixhtml mix-update="#form-feedback">
-          <div class='alert error'>Site under maintenance: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f'{lan}_reset_password_error').replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">Reset password</mixhtml>
+        <mixhtml mix-function="resetButtonText">
+          {getattr(languages, f'{lan}_reset_password_button_default')}
+        </mixhtml>
         """, 500
 
     finally:
