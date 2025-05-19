@@ -3,7 +3,7 @@
 
 <main id="login">
 
-  <h1>{{ languages[lan~'_login_title'] }}</h1>
+  <h1>{{ languages[lan~'_dry_login'] }}</h1>
 
   {% if message %}
     <div class="alert success" mix-ttl="3000">{{ message }}</div>
@@ -13,7 +13,7 @@
     <input 
       type="text" 
       name="user_email"
-      placeholder="{{ languages[lan~'_login_email_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_email'] }}"
       mix-check="^[^@]+@[^@]+\.[^@]+$"
       title="{{ languages[lan~'_login_email_title'] }}"
       class="input">
@@ -21,7 +21,7 @@
     <input 
       type="password"
       name="user_password"
-      placeholder="{{ languages[lan~'_login_password_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_password'] }}"
       mix-check="^.{2,20}$"
       title="{{ languages[lan~'_login_password_title'] }}"
       class="input">
@@ -29,8 +29,8 @@
     <button 
       class="btn" 
       mix-await="{{ languages[lan~'_login_button_loading'] }}" 
-      mix-default="{{ languages[lan~'_login_button'] }}">
-      {{ languages[lan~'_login_button'] }}
+      mix-default="{{ languages[lan~'_dry_login'] }}">
+      {{ languages[lan~'_dry_login'] }}
     </button>
   </form>
 

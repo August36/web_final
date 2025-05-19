@@ -5,52 +5,52 @@
 
 <form mix-post="/items/{{ item.item_pk }}/{{ lan }}" class="edit-item-form">
   <input type="text" name="item_name"
-    placeholder="{{ languages[lan~'_edit_item_name_placeholder'] }}"
+    placeholder="{{ languages[lan~'_dry_name'] }}"
     value="{{ item.item_name }}"
     mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{2,60}$"
     title="{{ languages[lan~'_edit_item_name_title'] }}"
     class="input" />
 
   <textarea name="item_description"
-    placeholder="{{ languages[lan~'_edit_item_description_placeholder'] }}"
+    placeholder="{{ languages[lan~'_dry_description'] }}"
     mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{5,400}$"
     title="{{ languages[lan~'_edit_item_description_title'] }}"
     class="input">{{ item.item_description }}</textarea>
 
   <input type="number" name="item_price"
-    placeholder="{{ languages[lan~'_edit_item_price_placeholder'] }}"
+    placeholder="{{ languages[lan~'_dry_price'] }}"
     value="{{ item.item_price }}"
     mix-check="^\d{1,6}(\.\d{1,2})?$"
     title="{{ languages[lan~'_edit_item_price_title'] }}"
     class="input" />
 
   <input type="text" name="item_address"
-    placeholder="{{ languages[lan~'_edit_item_address_placeholder'] }}"
+    placeholder="{{ languages[lan~'_dry_address'] }}"
     value="{{ item.item_address }}"
     mix-check="^.{5,100}$"
     title="{{ languages[lan~'_edit_item_address_title'] }}"
     class="input" />
 
   <input type="text" name="item_lat"
-    placeholder="{{ languages[lan~'_edit_item_lat_placeholder'] }}"
+    placeholder="{{ languages[lan~'_dry_lat'] }}"
     value="{{ item.item_lat }}"
     mix-check="^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$"
     title="{{ languages[lan~'_edit_item_lat_title'] }}"
     class="input" />
 
   <input type="text" name="item_lon"
-    placeholder="{{ languages[lan~'_edit_item_lon_placeholder'] }}"
+    placeholder="{{ languages[lan~'_dry_lon'] }}"
     value="{{ item.item_lon }}"
     mix-check="^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
     title="{{ languages[lan~'_edit_item_lon_title'] }}"
     class="input" />
 
   <button class="btn"
-    mix-await="{{ languages[lan~'_edit_item_button_await'] }}"
-    mix-default="{{ languages[lan~'_edit_item_button_default'] }}">
-    {{ languages[lan~'_edit_item_button_default'] }}
+    mix-await="{{ languages[lan~'_dry_saving'] }}"
+    mix-default="{{ languages[lan~'_dry_save_changes'] }}">
+    {{ languages[lan~'_dry_save_changes'] }}
   </button>
-  <a href="/profile/{{ lan }}">{{ languages[lan~'_edit_item_cancel'] }}</a>
+  <a href="/profile/{{ lan }}">{{ languages[lan~'_dry_cancel'] }}</a>
 </form>
 
 <div id="form-feedback"></div>

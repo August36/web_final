@@ -9,7 +9,7 @@
       class="input"
       type="text" 
       name="user_username" 
-      placeholder="{{ languages[lan~'_edit_profile_username_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_username'] }}"
       value="{{ old_values.get('user_username', '') }}" 
       mix-check="^[a-zA-Z0-9_]{2,20}$"
       title="{{ languages[lan~'_edit_profile_username_title'] }}">
@@ -18,7 +18,7 @@
       class="input"
       type="text" 
       name="user_name" 
-      placeholder="{{ languages[lan~'_edit_profile_firstname_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_first_name'] }}"
       value="{{ old_values.get('user_name', '') }}" 
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
       title="{{ languages[lan~'_edit_profile_firstname_title'] }}">
@@ -27,7 +27,7 @@
       class="input"
       type="text" 
       name="user_last_name" 
-      placeholder="{{ languages[lan~'_edit_profile_lastname_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_last_name'] }}"
       value="{{ old_values.get('user_last_name', '') }}" 
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
       title="{{ languages[lan~'_edit_profile_lastname_title'] }}">
@@ -36,21 +36,21 @@
       class="input"
       type="email" 
       name="user_email" 
-      placeholder="{{ languages[lan~'_edit_profile_email_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_email'] }}"
       value="{{ old_values.get('user_email', '') }}" 
       mix-check="^[^@]+@[^@]+\.[^@]+$"
       title="{{ languages[lan~'_edit_profile_email_title'] }}">
 
     <button class="btn" 
-      mix-await="{{ languages[lan~'_edit_profile_button_await'] }}" 
-      mix-default="{{ languages[lan~'_edit_profile_button_default'] }}">
-      {{ languages[lan~'_edit_profile_button_default'] }}
+      mix-await="{{ languages[lan~'_dry_saving'] }}" 
+      mix-default="{{ languages[lan~'_dry_save_changes'] }}">
+      {{ languages[lan~'_dry_save_changes'] }}
     </button>
   </form>
 
   <div id="form-feedback"></div>
 
-  <p><a href="/profile/{{ lan }}">{{ languages[lan~'_edit_profile_cancel'] }}</a></p>
+  <p><a href="/profile/{{ lan }}">{{ languages[lan~'_dry_cancel'] }}</a></p>
 </main>
 
 {% include "_footer_base.html" %}

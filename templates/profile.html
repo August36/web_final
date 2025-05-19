@@ -12,9 +12,9 @@
 
   <h2>{{ languages[lan~'_profile_personal_info'] }}</h2>
   <ul>
-    <li><strong>{{ languages[lan~'_profile_username'] }}</strong> {{ user.user_username }}</li>
-    <li><strong>{{ languages[lan~'_profile_name'] }}</strong> {{ user.user_name }} {{ user.user_last_name }}</li>
-    <li><strong>{{ languages[lan~'_profile_email'] }}</strong> {{ user.user_email }}</li>
+    <li><strong>{{ languages[lan~'_dry_username'] }}</strong> {{ user.user_username }}</li>
+    <li><strong>{{ languages[lan~'_dry_name'] }}</strong> {{ user.user_name }} {{ user.user_last_name }}</li>
+    <li><strong>{{ languages[lan~'_dry_email'] }}</strong> {{ user.user_email }}</li>
     <li><strong>{{ languages[lan~'_profile_member_since'] }}</strong> {{ user.user_created_at }}</li>
   </ul>
 
@@ -53,8 +53,8 @@
     {% for item in items %}
       <div class="item-card" id="x{{ item.item_pk }}">
         <h3>{{ item.item_name }}</h3>
-        <p><strong>{{ languages[lan~'_profile_price'] }}</strong> {{ item.item_price }} DKK</p>
-        <p><strong>{{ languages[lan~'_profile_address'] }}</strong> {{ item.item_address }}</p>
+        <p><strong>{{ languages[lan~'_dry_price'] }}</strong> {{ item.item_price }} DKK</p>
+        <p><strong>{{ languages[lan~'_dry_address'] }}</strong> {{ item.item_address }}</p>
         <p>{{ item.item_description }}</p>
 
         <a href="/items/{{ item.item_pk }}/edit">{{ languages[lan~'_profile_edit_spot'] }}</a>

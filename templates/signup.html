@@ -9,7 +9,7 @@
       class="input"
       name="user_username"
       type="text"
-      placeholder="{{ languages[lan~'_signup_username_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_username'] }}"
       title="{{ languages[lan~'_signup_username_title'] }}"
       value="{{ old_values.get('user_username', '') }}"
       mix-check="^[a-zA-Z0-9_]{2,20}$"
@@ -19,7 +19,7 @@
       class="input"
       name="user_name"
       type="text"
-      placeholder="{{ languages[lan~'_signup_firstname_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_first_name'] }}"
       title="{{ languages[lan~'_signup_first_name_title'] }}"
       value="{{ old_values.get('user_name', '') }}"
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
@@ -29,7 +29,7 @@
       class="input"
       name="user_last_name"
       type="text"
-      placeholder="{{ languages[lan~'_signup_lastname_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_last_name'] }}"
       title="{{ languages[lan~'_signup_last_name_title'] }}"
       value="{{ old_values.get('user_last_name', '') }}"
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
@@ -39,7 +39,7 @@
       class="input"
       name="user_email"
       type="text"
-      placeholder="{{ languages[lan~'_signup_email_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_email'] }}"
       title="{{ languages[lan~'_signup_email_title'] }}"
       value="{{ old_values.get('user_email', '') }}"
       mix-check="^[^@]+@[^@]+\.[^@]+$"
@@ -49,7 +49,7 @@
       class="input"
       name="user_password"
       type="password"
-      placeholder="{{ languages[lan~'_signup_password_placeholder'] }}"
+      placeholder="{{ languages[lan~'_dry_password'] }}"
       title="{{ languages[lan~'_signup_password_title'] }}"
       value="{{ old_values.get('user_password', '') }}"
       mix-check="^.{2,20}$"
@@ -58,9 +58,9 @@
     <button 
       class="btn" 
       mix-await="{{ languages[lan~'_signup_button_await'] }}" 
-      mix-default="{{ languages[lan~'_signup_button_default'] }}"
+      mix-default="{{ languages[lan~'_dry_signup'] }}"
     >
-      {{ languages[lan~'_signup_button_default'] }}
+      {{ languages[lan~'_dry_signup'] }}
     </button>
   </form>
 
