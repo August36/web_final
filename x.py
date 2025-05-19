@@ -41,48 +41,48 @@ ITEM_LON_REGEX = r"^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
 def validate_item_name():
     name = request.form.get("item_name", "").strip()
     if len(name) < 2 or len(name) > 60:
-        raise Exception("company_ex name must be between 2 and 60 characters")
+        raise Exception("skatespots_ex name must be between 2 and 60 characters")
     if not re.match(ITEM_NAME_REGEX, name):
-        raise Exception("company_ex name contains invalid characters")
+        raise Exception("skatespots_ex name contains invalid characters")
     return name
 
 
 def validate_item_description():
     description = request.form.get("item_description", "").strip()
     if len(description) < 5 or len(description) > 400:
-        raise Exception("company_ex description must be between 5 and 400 characters")
+        raise Exception("skatespots_ex description must be between 5 and 400 characters")
     if not re.match(ITEM_DESCRIPTION_REGEX, description):
-        raise Exception("company_ex description contains invalid characters")
+        raise Exception("skatespots_ex description contains invalid characters")
     return description
 
 
 def validate_item_address():
     address = request.form.get("item_address", "").strip()
     if len(address) < 5 or len(address) > 100:
-        raise Exception("company_ex address must be between 5 and 100 characters")
+        raise Exception("skatespots_ex address must be between 5 and 100 characters")
     if not re.match(ITEM_ADDRESS_REGEX, address):
-        raise Exception("company_ex address contains invalid characters")
+        raise Exception("skatespots_ex address contains invalid characters")
     return address
 
 
 def validate_item_price():
     price = request.form.get("item_price", "").strip()
     if not re.match(ITEM_PRICE_REGEX, price):
-        raise Exception("company_ex price must be a number with up to 2 decimals")
+        raise Exception("skatespots_ex price must be a number with up to 2 decimals")
     return float(price)
 
 
 def validate_item_lat():
     lat = request.form.get("item_lat", "").strip()
     if not re.match(ITEM_LAT_REGEX, lat):
-        raise Exception("company_ex latitude is invalid")
+        raise Exception("skatespots_ex latitude is invalid")
     return float(lat)
 
 
 def validate_item_lon():
     lon = request.form.get("item_lon", "").strip()
     if not re.match(ITEM_LON_REGEX, lon):
-        raise Exception("company_ex longitude is invalid")
+        raise Exception("skatespots_ex longitude is invalid")
     return float(lon)
 
 ############################## image validation
@@ -93,15 +93,15 @@ MAX_IMAGES_PER_ITEM = 3
 def validate_item_images():
     images_names = []
     if "files" not in request.files:
-        raise Exception("company_ex at least one file must be selected")
+        raise Exception("skatespots_ex at least one file must be selected")
 
     files = request.files.getlist('files')
 
     if not files or all(f.filename == '' for f in files):
-        raise Exception("company_ex at least one file must be selected")
+        raise Exception("skatespots_ex at least one file must be selected")
 
     if len(files) > MAX_IMAGES_PER_ITEM:
-        raise Exception("company_ex max 3 images per item")
+        raise Exception("skatespots_ex max 3 images per item")
 
     for the_file in files:
         file_size = len(the_file.read())  # size is in bytes                 
@@ -109,9 +109,9 @@ def validate_item_images():
         the_file.seek(0)
         file_extension = file_extension.lstrip(".")
         if file_extension not in ALLOWED_EXTENSIONS:
-            raise Exception("company_ex file extension not allowed")  
+            raise Exception("skatespots_ex file extension not allowed")  
         if file_size > MAX_FILE_SIZE:
-            raise Exception("company_ex file too large")  
+            raise Exception("skatespots_ex file too large")  
         new_file_name = f"{uuid.uuid4().hex}.{file_extension}"
         images_names.append(new_file_name)
         file_path = os.path.join("static/uploads", new_file_name)
@@ -131,7 +131,7 @@ def validate_image_pk(image_pk):
 ##############################
 REGEX_PAGE_NUMBER = "^[1-9][0-9]*$"
 def validate_page_number(page_number):
-    error = "company_ex page number"
+    error = "skatespots_ex page number"
     page_number = page_number.strip()
     if not re.match(REGEX_PAGE_NUMBER, page_number): raise Exception(error)
     return int(page_number)
@@ -183,14 +183,14 @@ def validate_search_query(q):
 #Validate user_pk
 def validate_user_pk(user_pk):
     if not str(user_pk).isdigit():
-        raise Exception("company_ex invalid user id")
+        raise Exception("skatespots_ex invalid user id")
     return int(user_pk)
 
 ##############################
 #Validate item_pk
 def validate_item_pk(item_pk):
     if not str(item_pk).isdigit():
-        raise Exception("company_ex invalid item id")
+        raise Exception("skatespots_ex invalid item id")
     return int(item_pk)
 
 ##############################

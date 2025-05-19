@@ -191,7 +191,7 @@ def get_items_by_page(page_number):
     except Exception as ex:
         ic(ex)
 
-        if "company_ex page_number" in str(ex):
+        if "skatespots_ex page_number" in str(ex):
             return """
                 <mixhtml mix-top="body">
                     page number invalid
