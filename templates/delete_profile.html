@@ -2,23 +2,27 @@
 {% include "_nav.html" %}
 
 <main id="delete-profile">
-  <h1>Delete Profile</h1>
+  <h1>{{ languages[lan~'_delete_profile_title'] }}</h1>
 
-  <form mix-post="/profile/delete" id="delete-profile-form">
+  <form mix-post="/profile/delete/{{ lan }}" id="delete-profile-form">
     <input 
       class="input" 
       type="password" 
       name="user_password" 
-      placeholder="Enter your password to confirm" 
+      placeholder="{{ languages[lan~'_delete_profile_password_placeholder'] }}" 
       mix-check="^.{2,20}$"
-      title="Password must be between 2 and 20 characters.">
+      title="{{ languages[lan~'_delete_profile_password_title'] }}">
 
-    <button class="btn" mix-await="Deleting..." mix-default="Delete my account">Delete my account</button>
+    <button class="btn" 
+      mix-await="{{ languages[lan~'_delete_profile_button_await'] }}" 
+      mix-default="{{ languages[lan~'_delete_profile_button_default'] }}">
+      {{ languages[lan~'_delete_profile_button_default'] }}
+    </button>
   </form>
 
   <div id="form-feedback"></div>
 
-  <p><a href="{{ url_for('profile') }}">Cancel</a></p>
+  <p><a href="/profile/{{ lan }}">{{ languages[lan~'_delete_profile_cancel'] }}</a></p>
 </main>
 
 {% include "_footer_base.html" %}

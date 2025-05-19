@@ -2,50 +2,55 @@
 {% include "_nav.html" %}
 
 <main id="edit-profile">
-  <h1>Edit Profile</h1>
+  <h1>{{ languages[lan~'_edit_profile_title'] }}</h1>
 
-  <form mix-post="/profile/edit" id="edit-profile-form">
+  <form mix-post="/profile/edit/{{ lan }}" id="edit-profile-form">
     <input 
       class="input"
       type="text" 
       name="user_username" 
-      placeholder="Username"
+      placeholder="{{ languages[lan~'_edit_profile_username_placeholder'] }}"
       value="{{ old_values.get('user_username', '') }}" 
       mix-check="^[a-zA-Z0-9_]{2,20}$"
-      title="Username must be 2–20 characters. Letters, numbers and underscores only.">
+      title="{{ languages[lan~'_edit_profile_username_title'] }}">
 
     <input 
       class="input"
       type="text" 
       name="user_name" 
-      placeholder="First name"
+      placeholder="{{ languages[lan~'_edit_profile_firstname_placeholder'] }}"
       value="{{ old_values.get('user_name', '') }}" 
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
-      title="First name must be 2–20 letters only.">
+      title="{{ languages[lan~'_edit_profile_firstname_title'] }}">
 
     <input 
       class="input"
       type="text" 
       name="user_last_name" 
-      placeholder="Last name"
+      placeholder="{{ languages[lan~'_edit_profile_lastname_placeholder'] }}"
       value="{{ old_values.get('user_last_name', '') }}" 
       mix-check="^[a-zA-ZæøåÆØÅ]{2,20}$"
-      title="Last name must be 2–20 letters only.">
+      title="{{ languages[lan~'_edit_profile_lastname_title'] }}">
 
     <input 
       class="input"
       type="email" 
       name="user_email" 
-      placeholder="Email"
+      placeholder="{{ languages[lan~'_edit_profile_email_placeholder'] }}"
       value="{{ old_values.get('user_email', '') }}" 
       mix-check="^[^@]+@[^@]+\.[^@]+$"
-      title="Enter a valid email address like example@example.com">
+      title="{{ languages[lan~'_edit_profile_email_title'] }}">
 
-    <button class="btn" mix-await="Saving..." mix-default="Save changes">Save changes</button>
+    <button class="btn" 
+      mix-await="{{ languages[lan~'_edit_profile_button_await'] }}" 
+      mix-default="{{ languages[lan~'_edit_profile_button_default'] }}">
+      {{ languages[lan~'_edit_profile_button_default'] }}
+    </button>
   </form>
+
   <div id="form-feedback"></div>
 
-  <p><a href="{{ url_for('profile') }}">Cancel</a></p>
+  <p><a href="/profile/{{ lan }}">{{ languages[lan~'_edit_profile_cancel'] }}</a></p>
 </main>
 
 {% include "_footer_base.html" %}

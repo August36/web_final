@@ -215,9 +215,12 @@ def get_items_by_page(page_number):
 
 ##############################
 # ***item post***
-@app.post("/item")
-def post_item():
+@app.post("/item/<lan>")
+def post_item(lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user = x.validate_user_logged()
 
         validators = [
@@ -247,7 +250,9 @@ def post_item():
             <mixhtml mix-update="#form-feedback">
               {error_html}
             </mixhtml>
-            <mixhtml mix-function="resetButtonText">Upload skate spot</mixhtml>
+            <mixhtml mix-function="resetButtonText">
+              {getattr(languages, f"{lan}_upload_item_button_default")}
+            </mixhtml>
             """, 400
 
         db, cursor = x.db()
@@ -297,15 +302,14 @@ def post_item():
         item_html = f"""
         <div class="item-card" id="x{item_pk}">
             <h3>{values['item_name']}</h3>
-            <p><strong>Price:</strong> {values['item_price']} DKK</p>
-            <p><strong>Address:</strong> {values['item_address']}</p>
+            <p><strong>{getattr(languages, f"{lan}_profile_price")}</strong> {values['item_price']} DKK</p>
+            <p><strong>{getattr(languages, f"{lan}_profile_address")}</strong> {values['item_address']}</p>
             <p>{values['item_description']}</p>
 
-            <a href="/items/{item_pk}/edit">Edit spot</a>
-            <button mix-delete="/items/{item_pk}">Delete item {values['item_name']}</button>
+            <a href="/items/{item_pk}/edit/{lan}">{getattr(languages, f"{lan}_profile_edit_spot")}</a>
+            <button mix-delete="/items/{item_pk}/{lan}">{getattr(languages, f"{lan}_profile_delete_item")} {values['item_name']}</button>
 
-            <div class="item-images"></div>
-        </div>
+            <div class="item-images">
         """
         for img in images:
             item_html += f"""
@@ -313,30 +317,32 @@ def post_item():
                     <img class="uploaded_imgs_profile"
                          src="/static/uploads/{img['image_name']}"
                          alt="{img['image_name']}">
-                    <button mix-delete="/images/{img['image_pk']}">Delete image</button>
+                    <button mix-delete="/images/{img['image_pk']}/{lan}">{getattr(languages, f"{lan}_profile_delete_image")}</button>
                 </div>
             """
-        item_html += f"""
-            </div>
-            <button mix-delete="/items/{item_pk}">Delete item</button>
-        </div>
-        """
+        item_html += "</div></div>"
 
-        blank_form_html = render_template("upload_item_form.html", form=None, errors=None)
+        blank_form_html = render_template(
+            "upload_item_form.html",
+            form=None,
+            errors=None,
+            lan=lan,
+            languages=languages
+        )
 
         return f"""
         <mixhtml mix-replace="#form-feedback">
-        <div class='alert success' mix-ttl="3000">
-            ✅ Spot uploaded successfully
-        </div>
+          <div class='alert success' mix-ttl="3000">
+            {getattr(languages, f"{lan}_upload_item_success")}
+          </div>
         </mixhtml>
 
         <mixhtml mix-update="#item-form">
-        {blank_form_html}
+          {blank_form_html}
         </mixhtml>
 
         <mixhtml mix-after="#items-h2">
-        {item_html}
+          {item_html}
         </mixhtml>
         """, 200
 
@@ -344,20 +350,26 @@ def post_item():
         ic(ex)
         return f"""
         <mixhtml mix-update="#form-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f"{lan}_upload_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">Upload skate spot</mixhtml>
+        <mixhtml mix-function="resetButtonText">
+          {getattr(languages, f"{lan}_upload_item_button_default")}
+        </mixhtml>
         """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***item edit post***
-@app.post("/items/<item_pk>")
-def edit_item_post(item_pk):
+@app.post("/items/<item_pk>/<lan>")
+def edit_item_post(item_pk, lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user = x.validate_user_logged()
         item_pk = x.validate_item_pk(item_pk)
 
@@ -387,7 +399,7 @@ def edit_item_post(item_pk):
             <mixhtml mix-update="#form-feedback">
               {error_html}
             </mixhtml>
-            <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_item_button_default")}</mixhtml>
             """, 400
 
         db, cursor = x.db()
@@ -420,27 +432,32 @@ def edit_item_post(item_pk):
         db.commit()
 
         return f"""
-        <mixhtml mix-redirect="/profile?item_message=✅ Item updated successfully"></mixhtml>
+        <mixhtml mix-redirect="/profile/{lan}?item_message={getattr(languages, f'{lan}_profile_item_updated')}"></mixhtml>
         """, 200
 
     except Exception as ex:
         ic(ex)
         return f"""
         <mixhtml mix-update="#form-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f"{lan}_profile_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+        <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_item_button_default")}</mixhtml>
         """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***item edit get***
 @app.get("/items/<item_pk>/edit")
-def edit_item_page(item_pk):
+@app.get("/items/<item_pk>/edit/<lan>")
+def edit_item_page(item_pk, lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user = x.validate_user_logged()
         item_pk = x.validate_item_pk(item_pk)
 
@@ -453,7 +470,12 @@ def edit_item_page(item_pk):
         if not item:
             raise Exception("Item not found")
 
-        return render_template("edit_item.html", item=item), 200
+        return render_template(
+            "edit_item.html",
+            item=item,
+            lan=lan,
+            languages=languages
+        ), 200
 
     except Exception as ex:
         ic(ex)
@@ -463,11 +485,15 @@ def edit_item_page(item_pk):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+
 ##############################
 # ***image delete***
-@app.delete("/images/<image_pk>")
-def delete_image(image_pk):
+@app.delete("/images/<image_pk>/<lan>")
+def delete_image(image_pk, lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         image_pk = x.validate_image_pk(image_pk)
         user = x.validate_user_logged()
 
@@ -480,7 +506,7 @@ def delete_image(image_pk):
         <mixhtml mix-remove="#x{image_pk}"></mixhtml>
         <mixhtml mix-after="#items-h2">
         <div class='alert success' mix-ttl="3000">
-            ✅ Image deleted successfully
+            {getattr(languages, f"{lan}_profile_image_deleted")}
         </div>
         </mixhtml>
         """, 200
@@ -496,9 +522,12 @@ def delete_image(image_pk):
 
 ##############################
 # ***item delete***
-@app.delete("/items/<item_pk>")
-def delete_item(item_pk):
+@app.delete("/items/<item_pk>/<lan>")
+def delete_item(item_pk, lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user = x.validate_user_logged()
         item_pk = x.validate_item_pk(item_pk)
 
@@ -518,7 +547,7 @@ def delete_item(item_pk):
         <mixhtml mix-remove="#x{item_pk}"></mixhtml>
         <mixhtml mix-after="#items-h2">
         <div class='alert success' mix-ttl="3000">
-            ✅ Spot deleted successfully
+            {getattr(languages, f"{lan}_profile_item_deleted")}
         </div>
         </mixhtml>
         """, 200
@@ -530,6 +559,7 @@ def delete_item(item_pk):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 ##############################
@@ -703,24 +733,24 @@ def login(lan):
         user = cursor.fetchone()
 
         if not user:
-            raise Exception(getattr(languages, f"{lan}_login_user_not_found"))
+            raise Exception(getattr(languages, f"{lan}_login_error_not_found"))
 
         if not user["user_verified"]:
             return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_login_verify_email_required")}</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_login_error_verify_email")}</div>
             </mixhtml>
             """, 403
 
         if user["user_blocked_at"] != 0:
             return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_login_account_blocked")}</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_login_error_blocked")}</div>
             </mixhtml>
             """, 403
 
         if not check_password_hash(user["user_password"], user_password):
-            raise Exception(getattr(languages, f"{lan}_login_invalid_credentials"))
+            raise Exception(getattr(languages, f"{lan}_login_error_credentials"))
 
         user.pop("user_password")
         session["user"] = user
@@ -1209,8 +1239,12 @@ def reset_password(reset_key):
 ##############################
 # ***profile get***
 @app.get("/profile")
-def profile():
+@app.get("/profile/<lan>")
+def profile(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user = x.validate_user_logged()
         profile_message = request.args.get("profile_message", "")
         item_message = request.args.get("item_message", "")
@@ -1235,11 +1269,13 @@ def profile():
             user=user,
             items=items,
             active_profile="active",
-            title="Profile",
+            title=getattr(languages, f"{lan}_profile_title"),
             form=None,
             errors=None,
             profile_message=profile_message,
-            item_message=item_message
+            item_message=item_message,
+            lan=lan,
+            languages=languages
         ), 200
 
     except Exception as ex:
@@ -1251,11 +1287,17 @@ def profile():
         if "db" in locals(): db.close()
 
 
+
 ##############################
 # ***profile edit get***
 @app.get("/profile/edit")
-def edit_profile():
+@app.get("/profile/edit/<lan>")
+def edit_profile(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed:
+            lan = "en"
+
         if "user" not in session:
             return redirect(url_for("show_login")), 302
 
@@ -1264,7 +1306,9 @@ def edit_profile():
             "edit_profile.html",
             user=user,
             old_values=user,
-            message=""
+            message="",
+            lan=lan,
+            languages=languages
         ), 200
 
     except Exception as ex:
@@ -1272,9 +1316,12 @@ def edit_profile():
 
 ##############################
 # ***profile edit post***
-@app.post("/profile/edit")
-def update_profile():
+@app.post("/profile/edit/<lan>")
+def update_profile(lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user = x.validate_user_logged()
         user_pk = user["user_pk"]
 
@@ -1303,7 +1350,7 @@ def update_profile():
             <mixhtml mix-update="#profile-feedback">
               {error_html}
             </mixhtml>
-            <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
             """, 400
 
         # Update DB
@@ -1329,18 +1376,17 @@ def update_profile():
         # Opdater session
         session["user"].update(values)
 
-        return """
-        <mixhtml mix-redirect="/profile?profile_message=Profile updated successfully"></mixhtml>
+        return f"""
+        <mixhtml mix-redirect="/profile/{lan}?profile_message={getattr(languages, f'{lan}_profile_message_success')}"></mixhtml>
         """, 200
-
 
     except Exception as ex:
         ic(ex)
         return f"""
         <mixhtml mix-update="#profile-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f"{lan}_profile_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">Save changes</mixhtml>
+        <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
         """, 500
 
     finally:
@@ -1351,7 +1397,11 @@ def update_profile():
 ##############################
 # ***profile delete get***
 @app.get("/profile/delete")
-def delete_profile():
+@app.get("/profile/delete/<lan>")
+def delete_profile(lan="en"):
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+
     if "user" not in session:
         return redirect(url_for("show_login")), 302
 
@@ -1359,14 +1409,20 @@ def delete_profile():
         "delete_profile.html",
         message="",
         user_password_error="",
-        old_values={}
+        old_values={},
+        lan=lan,
+        languages=languages
     ), 200
+
 
 ##############################
 # ***profile delete post***
-@app.post("/profile/delete")
-def confirm_delete_profile():
+@app.post("/profile/delete/<lan>")
+def confirm_delete_profile(lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         if "user" not in session:
             return redirect(url_for("show_login")), 302
 
@@ -1381,9 +1437,9 @@ def confirm_delete_profile():
         result = cursor.fetchone()
 
         if not result or not check_password_hash(result["user_password"], user_password):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Invalid password. Try again.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_delete_profile_invalid_password")}</div>
             </mixhtml>
             """, 403
 
@@ -1395,20 +1451,21 @@ def confirm_delete_profile():
         x.send_delete_confirmation(user_email)
         session.pop("user", None)
 
-        return """
-        <mixhtml mix-redirect="/login?profile_deleted=Your account has been deleted."></mixhtml>
+        return f"""
+        <mixhtml mix-redirect="/login/{lan}?profile_deleted={getattr(languages, f'{lan}_delete_profile_success')}"></mixhtml>
         """, 200
 
     except Exception as ex:
         return f"""
         <mixhtml mix-update="#form-feedback">
-          <div class='alert error'>Something went wrong: {str(ex)}</div>
+          <div class='alert error'>{getattr(languages, f"{lan}_delete_profile_unknown_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 ##############################

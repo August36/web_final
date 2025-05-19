@@ -130,32 +130,293 @@ dk_signup_unknown_error = "Ukendt fejl: {str(ex)}"
 # ------------------------
 # Profile - copy from profile.html
 # ------------------------
-# (to be filled in next step)
+
+en_profile_title = "Profile"
+dk_profile_title = "Profil"
+
+en_profile_personal_info = "Personal info"
+dk_profile_personal_info = "Personlige oplysninger"
+
+en_profile_username = "Username"
+dk_profile_username = "Brugernavn"
+
+en_profile_name = "Name"
+dk_profile_name = "Navn"
+
+en_profile_email = "Email"
+dk_profile_email = "Email"
+
+en_profile_member_since = "Member since"
+dk_profile_member_since = "Medlem siden"
+
+en_profile_edit = "Edit profile"
+dk_profile_edit = "Rediger profil"
+
+en_profile_delete = "Delete profile"
+dk_profile_delete = "Slet profil"
+
+en_profile_upload_spot = "Upload a spot"
+dk_profile_upload_spot = "Upload et spot"
+
+en_profile_your_spots = "Your spots"
+dk_profile_your_spots = "Dine spots"
+
+en_profile_price = "Price:"
+dk_profile_price = "Pris:"
+
+en_profile_address = "Address:"
+dk_profile_address = "Adresse:"
+
+en_profile_edit_spot = "Edit spot"
+dk_profile_edit_spot = "Rediger spot"
+
+en_profile_delete_image = "Delete image"
+dk_profile_delete_image = "Slet billede"
+
+# Bemærk: "Delete item {{ item.item_name }}" er dynamisk — du skal håndtere det i app.py.
+
+en_profile_delete_item_btn = "Delete spot"
+dk_profile_delete_item_btn = "Slet spot"
+
 
 # ------------------------
 # Profile - copy sent to profile.html (from routes)
 # ------------------------
-# (to be filled in next step)
+# ✅ Success messages (query param-based)
+en_profile_message_success = "Your profile has been updated."
+dk_profile_message_success = "Din profil er blevet opdateret."
+
+en_profile_item_success = "Your item has been saved successfully."
+dk_profile_item_success = "Dit spot er blevet gemt."
+
+# ✅ Item updated successfully
+en_profile_item_updated = "Item updated successfully"
+dk_profile_item_updated = "Spot er blevet opdateret"
+
+# ✅ Spot deleted successfully
+en_profile_item_deleted = "Spot deleted successfully"
+dk_profile_item_deleted = "Spot er blevet slettet"
+
+# ✅ Image deleted successfully
+en_profile_image_deleted = "Image deleted successfully"
+dk_profile_image_deleted = "Billede er blevet slettet"
+
+# ❌ Error messages
+en_profile_item_error = "Something went wrong: {str(ex)}"
+dk_profile_item_error = "Noget gik galt: {str(ex)}"
 
 # ------------------------
 # Edit profile - copy from edit_profile.html
 # ------------------------
-# (to be filled in next step)
 
-# ------------------------
-# Edit profile - copy sent to edit_profile.html (from routes)
-# ------------------------
-# (to be filled in next step)
+en_edit_profile_title = "Edit Profile"
+dk_edit_profile_title = "Rediger profil"
+
+en_edit_profile_username_placeholder = "Username"
+dk_edit_profile_username_placeholder = "Brugernavn"
+
+en_edit_profile_username_title = "Username must be 2–20 characters. Letters, numbers and underscores only."
+dk_edit_profile_username_title = "Brugernavn skal være 2–20 tegn. Kun bogstaver, tal og understregninger tilladt."
+
+en_edit_profile_firstname_placeholder = "First name"
+dk_edit_profile_firstname_placeholder = "Fornavn"
+
+en_edit_profile_firstname_title = "First name must be 2–20 letters only."
+dk_edit_profile_firstname_title = "Fornavn skal være 2–20 bogstaver."
+
+en_edit_profile_lastname_placeholder = "Last name"
+dk_edit_profile_lastname_placeholder = "Efternavn"
+
+en_edit_profile_lastname_title = "Last name must be 2–20 letters only."
+dk_edit_profile_lastname_title = "Efternavn skal være 2–20 bogstaver."
+
+en_edit_profile_email_placeholder = "Email"
+dk_edit_profile_email_placeholder = "Email"
+
+en_edit_profile_email_title = "Enter a valid email address like example@example.com"
+dk_edit_profile_email_title = "Indtast en gyldig e-mail, fx eksempel@eksempel.dk"
+
+en_edit_profile_button_default = "Save changes"
+dk_edit_profile_button_default = "Gem ændringer"
+
+en_edit_profile_button_await = "Saving..."
+dk_edit_profile_button_await = "Gemmer..."
+
+en_edit_profile_cancel = "Cancel"
+dk_edit_profile_cancel = "Annuller"
 
 # ------------------------
 # Delete profile - copy from delete_profile.html
 # ------------------------
-# (to be filled in next step)
+
+en_delete_profile_title = "Delete Profile"
+dk_delete_profile_title = "Slet profil"
+
+en_delete_profile_password_placeholder = "Enter your password to confirm"
+dk_delete_profile_password_placeholder = "Indtast din adgangskode for at bekræfte"
+
+en_delete_profile_password_title = "Password must be between 2 and 20 characters."
+dk_delete_profile_password_title = "Adgangskode skal være mellem 2 og 20 tegn."
+
+en_delete_profile_button_default = "Delete my account"
+dk_delete_profile_button_default = "Slet min konto"
+
+en_delete_profile_button_await = "Deleting..."
+dk_delete_profile_button_await = "Sletter..."
+
+en_delete_profile_cancel = "Cancel"
+dk_delete_profile_cancel = "Annuller"
+
 
 # ------------------------
 # Delete profile - copy sent to delete_profile.html (from routes)
 # ------------------------
-# (to be filled in next step)
+en_delete_profile_invalid_password = "Invalid password. Try again."
+dk_delete_profile_invalid_password = "Ugyldig adgangskode. Prøv igen."
+
+en_delete_profile_success = "Your account has been deleted."
+dk_delete_profile_success = "Din konto er blevet slettet."
+
+en_delete_profile_unknown_error = "Something went wrong: {str(ex)}"
+dk_delete_profile_unknown_error = "Noget gik galt: {str(ex)}"
+
+# ------------------------
+# Upload item form - HTML copy
+# ------------------------
+
+en_upload_item_name_placeholder = "Name"
+dk_upload_item_name_placeholder = "Navn"
+
+en_upload_item_name_title = "Name must be 2–60 characters. Letters, numbers and simple punctuation allowed."
+dk_upload_item_name_title = "Navn skal være 2–60 tegn. Bogstaver, tal og enkel tegnsætning tilladt."
+
+en_upload_item_description_placeholder = "Description"
+dk_upload_item_description_placeholder = "Beskrivelse"
+
+en_upload_item_description_title = "Description must be 5–400 characters. Letters, numbers and punctuation allowed."
+dk_upload_item_description_title = "Beskrivelse skal være 5–400 tegn. Bogstaver, tal og tegnsætning tilladt."
+
+en_upload_item_price_placeholder = "Price"
+dk_upload_item_price_placeholder = "Pris"
+
+en_upload_item_price_title = "Enter a price like 199.95. Max 6 digits before dot and 2 after."
+dk_upload_item_price_title = "Indtast en pris som 199.95. Max 6 cifre før punktum og 2 efter."
+
+en_upload_item_address_placeholder = "Address"
+dk_upload_item_address_placeholder = "Adresse"
+
+en_upload_item_address_title = "Address must be 5–100 characters."
+dk_upload_item_address_title = "Adressen skal være 5–100 tegn."
+
+en_upload_item_lat_placeholder = "Latitude"
+dk_upload_item_lat_placeholder = "Breddegrad"
+
+en_upload_item_lat_title = "Latitude must be between -90 and 90 (e.g. 55.6761)."
+dk_upload_item_lat_title = "Breddegrad skal være mellem -90 og 90 (f.eks. 55.6761)."
+
+en_upload_item_lon_placeholder = "Longitude"
+dk_upload_item_lon_placeholder = "Længdegrad"
+
+en_upload_item_lon_title = "Longitude must be between -180 and 180 (e.g. 12.5683)."
+dk_upload_item_lon_title = "Længdegrad skal være mellem -180 og 180 (f.eks. 12.5683)."
+
+en_upload_item_file_title = "Please select between 1 and 3 images (PNG, JPG, JPEG, GIF, or WEBP)"
+dk_upload_item_file_title = "Vælg mellem 1 og 3 billeder (PNG, JPG, JPEG, GIF eller WEBP)"
+
+en_upload_item_button_default = "Upload skate spot"
+dk_upload_item_button_default = "Upload skate spot"
+
+en_upload_item_button_await = "Uploading..."
+dk_upload_item_button_await = "Uploader..."
+
+# Upload item - success
+en_upload_item_success = "✅ Spot uploaded successfully"
+dk_upload_item_success = "✅ Spot er blevet uploadet"
+
+en_upload_item_error = "Something went wrong: {str(ex)}"
+dk_upload_item_error = "Noget gik galt: {str(ex)}"
+
+# ------------------------
+# Edit item - HTML copy
+# ------------------------
+
+en_edit_item_title = "Edit your spot"
+dk_edit_item_title = "Rediger dit spot"
+
+en_edit_item_name_placeholder = "Name"
+dk_edit_item_name_placeholder = "Navn"
+
+en_edit_item_name_title = "Name must be 2–60 characters. Letters, numbers and simple punctuation allowed."
+dk_edit_item_name_title = "Navn skal være 2–60 tegn. Bogstaver, tal og enkel tegnsætning tilladt."
+
+en_edit_item_description_placeholder = "Description"
+dk_edit_item_description_placeholder = "Beskrivelse"
+
+en_edit_item_description_title = "Description must be 5–400 characters. Letters, numbers and punctuation allowed."
+dk_edit_item_description_title = "Beskrivelse skal være 5–400 tegn. Bogstaver, tal og tegnsætning tilladt."
+
+en_edit_item_price_placeholder = "Price"
+dk_edit_item_price_placeholder = "Pris"
+
+en_edit_item_price_title = "Enter a price like 199.95. Max 6 digits before dot and 2 after."
+dk_edit_item_price_title = "Indtast en pris som 199.95. Max 6 cifre før punktum og 2 efter."
+
+en_edit_item_address_placeholder = "Address"
+dk_edit_item_address_placeholder = "Adresse"
+
+en_edit_item_address_title = "Address must be 5–100 characters."
+dk_edit_item_address_title = "Adressen skal være 5–100 tegn."
+
+en_edit_item_lat_placeholder = "Latitude"
+dk_edit_item_lat_placeholder = "Breddegrad"
+
+en_edit_item_lat_title = "Latitude must be between -90 and 90 (e.g. 55.6761)."
+dk_edit_item_lat_title = "Breddegrad skal være mellem -90 og 90 (f.eks. 55.6761)."
+
+en_edit_item_lon_placeholder = "Longitude"
+dk_edit_item_lon_placeholder = "Længdegrad"
+
+en_edit_item_lon_title = "Longitude must be between -180 and 180 (e.g. 12.5683)."
+dk_edit_item_lon_title = "Længdegrad skal være mellem -180 og 180 (f.eks. 12.5683)."
+
+en_edit_item_button_default = "Save changes"
+dk_edit_item_button_default = "Gem ændringer"
+
+en_edit_item_button_await = "Saving..."
+dk_edit_item_button_await = "Gemmer..."
+
+en_edit_item_cancel = "Cancel"
+dk_edit_item_cancel = "Annuller"
+
+# ------------------------
+# Edit item - copy sent via app.py
+# ------------------------
+
+en_profile_item_updated = "Item updated successfully"
+dk_profile_item_updated = "Spot er blevet opdateret"
+
+en_profile_item_error = "Something went wrong: {str(ex)}"
+dk_profile_item_error = "Noget gik galt: {str(ex)}"
+
+# ------------------------
+# Delete item - copy sent via app.py
+# ------------------------
+
+en_profile_item_deleted = "✅ Spot deleted successfully"
+dk_profile_item_deleted = "✅ Spot er blevet slettet"
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ------------------------
 # Forgot password - copy from forgot_password.html

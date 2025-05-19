@@ -1,49 +1,54 @@
-<form id="item-form" mix-post="/item" enctype="multipart/form-data">
-  <input name="item_name" type="text" placeholder="Name"
+<form id="item-form" mix-post="/item/{{ lan }}" enctype="multipart/form-data">
+  <input name="item_name" type="text"
+    placeholder="{{ languages[lan~'_upload_item_name_placeholder'] }}"
     value="{{ form.item_name if form else '' }}"
     mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{2,60}$"
-    title="Name must be 2–60 characters. Letters, numbers and simple punctuation allowed."
+    title="{{ languages[lan~'_upload_item_name_title'] }}"
     class="input">
 
-  <textarea name="item_description" placeholder="Description"
+  <textarea name="item_description"
+    placeholder="{{ languages[lan~'_upload_item_description_placeholder'] }}"
     mix-check="^[a-zA-Z0-9æøåÆØÅ\s.,'\&quot;()\-!?]{5,400}$"
-    title="Description must be 5–400 characters. Letters, numbers and punctuation allowed."
+    title="{{ languages[lan~'_upload_item_description_title'] }}"
     class="input">{{ form.item_description if form else '' }}</textarea>
 
-  <input name="item_price" type="number" step="0.01" placeholder="Price"
+  <input name="item_price" type="number" step="0.01"
+    placeholder="{{ languages[lan~'_upload_item_price_placeholder'] }}"
     value="{{ form.item_price if form else '' }}"
     mix-check="^\d{1,6}(\.\d{1,2})?$"
-    title="Enter a price like 199.95. Max 6 digits before dot and 2 after."
+    title="{{ languages[lan~'_upload_item_price_title'] }}"
     class="input">
 
-  <input name="item_address" type="text" placeholder="Address"
+  <input name="item_address" type="text"
+    placeholder="{{ languages[lan~'_upload_item_address_placeholder'] }}"
     value="{{ form.item_address if form else '' }}"
     mix-check="^.{5,100}$"
-    title="Address must be 5–100 characters."
+    title="{{ languages[lan~'_upload_item_address_title'] }}"
     class="input">
 
-  <input name="item_lat" type="text" placeholder="Latitude"
+  <input name="item_lat" type="text"
+    placeholder="{{ languages[lan~'_upload_item_lat_placeholder'] }}"
     value="{{ form.item_lat if form else '' }}"
     mix-check="^-?([0-8]?\d(\.\d{1,8})?|90(\.0{1,8})?)$"
-    title="Latitude must be between -90 and 90 (e.g. 55.6761)."
+    title="{{ languages[lan~'_upload_item_lat_title'] }}"
     class="input">
 
-  <input name="item_lon" type="text" placeholder="Longitude"
+  <input name="item_lon" type="text"
+    placeholder="{{ languages[lan~'_upload_item_lon_placeholder'] }}"
     value="{{ form.item_lon if form else '' }}"
     mix-check="^-?(1[0-7]\d|0?\d{1,2}|180)(\.\d{1,8})?$"
-    title="Longitude must be between -180 and 180 (e.g. 12.5683)."
+    title="{{ languages[lan~'_upload_item_lon_title'] }}"
     class="input">
 
-   <input 
-   name="files" 
-   type="file" 
-   multiple
-   accept=".png,.jpg,.jpeg,.gif,.webp"
-   class="input"
-   title="Please select between 1 and 3 images (PNG, JPG, JPEG, GIF, or WEBP)"
-   mix-check=".*">
+  <input name="files" type="file" multiple
+    accept=".png,.jpg,.jpeg,.gif,.webp"
+    class="input"
+    title="{{ languages[lan~'_upload_item_file_title'] }}"
+    mix-check=".*">
 
-  <button class="btn" mix-await="Uploading..." mix-default="Upload skate spot">
-    Upload skate spot
+  <button class="btn"
+    mix-await="{{ languages[lan~'_upload_item_button_await'] }}"
+    mix-default="{{ languages[lan~'_upload_item_button_default'] }}">
+    {{ languages[lan~'_upload_item_button_default'] }}
   </button>
 </form>
