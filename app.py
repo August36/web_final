@@ -8,6 +8,7 @@ import os
 import json
 import re
 import requests
+import languages
 
 from icecream import ic
 ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
@@ -681,22 +682,32 @@ def verify_user(verification_key):
 
 ##############################
 @app.get("/login")
-def show_login():
+@app.get("/login/<lan>")
+def show_login(lan="en"):
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+
     active_login = "active"
     profile_deleted_msg = request.args.get("profile_deleted", "")
-    # Hvis profile_deleted_msg er tom, brug den oprindelige "message"
     default_message = request.args.get("message", "")
     message = profile_deleted_msg if profile_deleted_msg else default_message
+
     return render_template(
         "login.html",
         title="Login",
         active_login=active_login,
-        message=message
+        message=message,
+        lan=lan,
+        languages=languages
     ), 200
 
+
 ##############################
-@app.post("/login")
-def login():
+@app.post("/login/<lan>")
+def login(lan):
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+
     try:
         user_email = x.validate_user_email()
         user_password = x.validate_user_password()
@@ -707,24 +718,24 @@ def login():
         user = cursor.fetchone()
 
         if not user:
-            raise Exception("User not found")
+            raise Exception(getattr(languages, f"{lan}_login_user_not_found"))
 
         if not user["user_verified"]:
             return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Please verify your email before logging in.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_login_verify_email_required")}</div>
             </mixhtml>
             """, 403
 
         if user["user_blocked_at"] != 0:
             return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class='alert error'>Your account is blocked.</div>
+              <div class='alert error'>{getattr(languages, f"{lan}_login_account_blocked")}</div>
             </mixhtml>
             """, 403
 
         if not check_password_hash(user["user_password"], user_password):
-            raise Exception("Invalid credentials")
+            raise Exception(getattr(languages, f"{lan}_login_invalid_credentials"))
 
         user.pop("user_password")
         session["user"] = user
@@ -745,6 +756,7 @@ def login():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 
 

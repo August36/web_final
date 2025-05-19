@@ -71,4 +71,3 @@ function add_markers_to_map(data){
             .bindPopup(item.item_name)
     });
 }
-

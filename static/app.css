@@ -175,6 +175,16 @@ input {
   }
 }
 
+#lang-switch-container{
+  display: flex;
+  gap: 1rem;
+}
+
+.lang-switch{
+  cursor: pointer;
+
+}
+
 /* INDEX-SPECIFIKT */
 main#index {
   display: grid;

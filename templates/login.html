@@ -1,42 +1,46 @@
 {% include "_header.html" %}
 {% include "_nav.html" %}
 
-
 <main id="login">
 
-    <h1>
-        {{ message }}
-    </h1>
+  <h1>{{ message }}</h1>
 
-    {% if message %}
-      <div class="alert success" mix-ttl="3000">{{ message }}</div>
-    {% endif %}
+  {% if message %}
+    <div class="alert success" mix-ttl="3000">{{ message }}</div>
+  {% endif %}
 
-    <form mix-post="/login" method="post">
-      <input 
-        type="text" 
-        name="user_email"
-        placeholder="Email"
-        mix-check="^[^@]+@[^@]+\.[^@]+$"
-        title="Please enter a valid email address"
-        class="input">
+  <form mix-post="/login/{{ lan }}" method="post">
+    <input 
+      type="text" 
+      name="user_email"
+      placeholder="{{ languages[lan~'_login_email'] }}"
+      mix-check="^[^@]+@[^@]+\.[^@]+$"
+      title="{{ languages[lan~'_login_email_title'] }}"
+      class="input">
 
-      <input 
-        type="password"
-        name="user_password"
-        placeholder="Password"
-        mix-check="^.{2,20}$"
-        title="Password must be between 2 and 20 characters"
-        class="input">
+    <input 
+      type="password"
+      name="user_password"
+      placeholder="{{ languages[lan~'_login_password'] }}"
+      mix-check="^.{2,20}$"
+      title="{{ languages[lan~'_login_password_title'] }}"
+      class="input">
 
-      <button class="btn" mix-await="Logging in..." mix-default="Login">Login</button>
-    </form>
+    <button 
+      class="btn" 
+      mix-await="{{ languages[lan~'_login_button_loading'] }}" 
+      mix-default="{{ languages[lan~'_login_button'] }}">
+      {{ languages[lan~'_login_button'] }}
+    </button>
+  </form>
 
-<div id="form-feedback"></div>
+  <div id="form-feedback"></div>
 
-    <p>
-        <a href="{{ url_for('show_forgot_password') }}">Forgot your password?</a>
-      </p>
+  <p>
+    <a href="{{ url_for('show_forgot_password') }}">
+      {{ languages[lan~'_login_forgot_password'] }}
+    </a>
+  </p>
 
 </main>
 
