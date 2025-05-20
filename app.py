@@ -61,6 +61,11 @@ def disable_cache(response):
 @app.get("/")
 def view_index():
     try:
+        lan = session.get("lan", "en")
+
+    except Exception as ex:
+        ic("LANGUAGE FEJL", ex)
+    try:
         db, cursor = x.db()
         q = """
         SELECT items.*, (
@@ -87,6 +92,7 @@ def view_index():
         rates = {}
         with open("rates.txt", "r") as file:
             rates = json.loads(file.read())
+        ic(rates)
         
         return render_template("view_index.html", title="Skatespots CPH", items=items, images=images, rates=rates), 200
 
@@ -302,12 +308,12 @@ def post_item(lan):
         item_html = f"""
         <div class="item-card" id="x{item_pk}">
             <h3>{values['item_name']}</h3>
-            <p><strong>{getattr(languages, f"{lan}_profile_price")}</strong> {values['item_price']} DKK</p>
-            <p><strong>{getattr(languages, f"{lan}_profile_address")}</strong> {values['item_address']}</p>
+            <p><strong>{getattr(languages, f"{lan}_dry_price")}</strong> {values['item_price']} DKK</p>
+            <p><strong>{getattr(languages, f"{lan}_dry_address")}</strong> {values['item_address']}</p>
             <p>{values['item_description']}</p>
 
             <a href="/items/{item_pk}/edit/{lan}">{getattr(languages, f"{lan}_profile_edit_spot")}</a>
-            <button mix-delete="/items/{item_pk}/{lan}">{getattr(languages, f"{lan}_profile_delete_item")} {values['item_name']}</button>
+            <button mix-delete="/items/{item_pk}/{lan}">{getattr(languages, f"{lan}_profile_delete_item_btn")} {values['item_name']}</button>
 
             <div class="item-images">
         """
@@ -399,7 +405,7 @@ def edit_item_post(item_pk, lan):
             <mixhtml mix-update="#form-feedback">
               {error_html}
             </mixhtml>
-            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_item_button_default")}</mixhtml>
+            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
             """, 400
 
         db, cursor = x.db()
@@ -441,7 +447,7 @@ def edit_item_post(item_pk, lan):
         <mixhtml mix-update="#form-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_profile_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_item_button_default")}</mixhtml>
+        <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
         """, 500
 
     finally:

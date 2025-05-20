@@ -51,6 +51,8 @@ dk_dry_lat = "Breddegrad"
 en_dry_lon = "Longitude"
 dk_dry_lon = "Længdegrad"
 
+#######bdfvdfg#########
+
 # ------------------------
 # Login - copy from login.html
 # ------------------------
@@ -123,9 +125,6 @@ dk_signup_button_await = "Tilmelder..."
 # Signup - copy sent via app.py
 # ------------------------
 
-en_signup_success = "Thank you for signing up. Please verify your email before logging in."
-dk_signup_success = "Tak for din tilmelding. Bekræft venligst din e-mail før du logger ind."
-
 en_signup_username_invalid = "Username must be 2–20 characters and not already taken."
 dk_signup_username_invalid = "Brugernavn skal være 2–20 tegn og må ikke være i brug."
 
@@ -186,6 +185,9 @@ dk_profile_delete_image = "Slet billede"
 
 en_profile_delete_item_btn = "Delete spot"
 dk_profile_delete_item_btn = "Slet spot"
+
+en_edit_profile_button_default = "Save changes"
+dk_edit_profile_button_default = "Gem ændringer"
 
 
 # ------------------------
@@ -329,19 +331,6 @@ dk_edit_item_lon_title = "Længdegrad skal være mellem -180 og 180 (f.eks. 12.5
 # Edit item - copy sent via app.py
 # ------------------------
 
-en_profile_item_updated = "Item updated successfully"
-dk_profile_item_updated = "Spot er blevet opdateret"
-
-en_profile_item_error = "Something went wrong: {str(ex)}"
-dk_profile_item_error = "Noget gik galt: {str(ex)}"
-
-# ------------------------
-# Delete item - copy sent via app.py
-# ------------------------
-
-en_profile_item_deleted = "✅ Spot deleted successfully"
-dk_profile_item_deleted = "✅ Spot er blevet slettet"
-
 # ------------------------
 # Admin
 # ------------------------
@@ -415,9 +404,6 @@ dk_reset_password_button_default = "Nulstil adgangskode"
 
 en_reset_password_title = "Reset your password"
 dk_reset_password_title = "Nulstil din adgangskode"
-
-en_reset_password_button_default = "Reset password"
-dk_reset_password_button_default = "Nulstil adgangskode"
 
 en_reset_password_button_await = "Resetting..."
 dk_reset_password_button_await = "Nulstiller..."
