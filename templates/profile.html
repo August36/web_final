@@ -66,9 +66,11 @@
           {% for img in item.images %}
             <div id="x{{ img.image_pk }}">
               <img class="uploaded_imgs_profile" src="/static/uploads/{{ img.image_name }}" alt="{{ img.image_name }}">
+              <!-- 
+              Udkommenteret slet img knap, da item uden imgs skaber bugs på index. Find løsning, eller fjern knappen helt og ryd op.
               <button mix-delete="/images/{{ img.image_pk }}/{{ lan }}">
                 {{ languages[lan~'_profile_delete_image'] }}
-              </button>
+              </button> -->
             </div>
           {% endfor %}
         </div>

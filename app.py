@@ -61,11 +61,6 @@ def disable_cache(response):
 @app.get("/")
 def view_index():
     try:
-        lan = session.get("lan", "en")
-
-    except Exception as ex:
-        ic("LANGUAGE FEJL", ex)
-    try:
         db, cursor = x.db()
         q = """
         SELECT items.*, (
@@ -92,7 +87,6 @@ def view_index():
         rates = {}
         with open("rates.txt", "r") as file:
             rates = json.loads(file.read())
-        ic(rates)
         
         return render_template("view_index.html", title="Skatespots CPH", items=items, images=images, rates=rates), 200
 
