@@ -1,4 +1,4 @@
-<a href="/items/{{ item.item_pk }}" mix-get class="item">
+<a href="/items/{{ item.item_pk }}/{{ lan }}" mix-get class="item">
     <img src="{{ url_for('static', filename='uploads/'+ item.item_image) }}" alt="{{ item.item_name }}">
     <p>
         {{ item.item_name }}

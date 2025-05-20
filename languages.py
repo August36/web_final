@@ -51,7 +51,27 @@ dk_dry_lat = "Breddegrad"
 en_dry_lon = "Longitude"
 dk_dry_lon = "Længdegrad"
 
-#######bdfvdfg#########
+# ------------------------
+# Index
+# ------------------------
+
+en_item_open_window = "Open in window"
+dk_item_open_window = "Åbn i nyt vindue"
+
+en_dry_unknown_error = "Something went wrong"
+dk_dry_unknown_error = "Noget gik galt"
+
+en_button_more_items = "Show more"
+dk_button_more_items = "Vis mere"
+
+en_pagination_invalid_page = "Page number is invalid"
+dk_pagination_invalid_page = "Sidetal er ugyldigt"
+
+en_nav_search_placeholder = "Search by spot name"
+dk_nav_search_placeholder = "Søg efter spot navn"
+
+en_nav_search_title = "Enter up to 50 characters"
+dk_nav_search_title = "Indtast op til 50 tegn"
 
 # ------------------------
 # Login - copy from login.html
@@ -98,6 +118,19 @@ dk_reset_success = "Adgangskode opdateret. Du kan nu logge ind."
 
 en_delete_success = "Your account has been deleted."
 dk_delete_success = "Din konto er blevet slettet."
+
+# ------------------------
+#Forgot password
+# ------------------------
+
+en_forgot_button_default = "Send reset link"
+dk_forgot_button_default = "Send nulstillingslink"
+
+en_forgot_invalid_email = "Enter a valid email address."
+dk_forgot_invalid_email = "Indtast en gyldig emailadresse."
+
+en_forgot_email_sent = "If your email exists, we've sent a reset link."
+dk_forgot_email_sent = "Hvis din email eksisterer, har vi sendt et nulstillingslink."
 
 # ------------------------
 # Signup - copy from signup.html

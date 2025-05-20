@@ -15,9 +15,9 @@
         <div>
             {{ "{:,.0f}".format(item.item_price|float * rates.rates.DKK) }} DKK
         </div>
-        <a href="/items/{{ item.item_pk }}" target="_blank">
-            Open in window
-        </a>
+            <a href="/items/{{ item.item_pk }}/{{ lan }}" target="_blank">
+                {{ languages[lan~'_item_open_window'] }}
+            </a>
     </div>
     <div id="img-wrapper">
         {% for image in images %}

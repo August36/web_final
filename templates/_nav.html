@@ -1,6 +1,6 @@
 <nav>
-    <a href="/">
-        Items
+    <a href="/{{ lan }}">
+        Spots
     </a>
 
     <div id="lang-switch-container">
@@ -13,11 +13,11 @@
         id="input_search" 
         oninput="search()"
         type="text" 
-        placeholder="Search by name"
+        placeholder="{{ languages[lan~'_nav_search_placeholder'] }}"
         name="q"
         maxlength="50"
         pattern=".{1,50}"
-        title="Enter up to 50 characters"
+        title="{{ languages[lan~'_nav_search_title'] }}"
         required
     >
         <div id="search_results" class="hidden">
@@ -26,14 +26,14 @@
 
     <div>
         {% if not g.is_session %}
-            <a class="{{ active_signup }}" href="/signup">Signup</a>
-            <a class="{{ active_login }}" href="/login">Login</a>
+            <a class="{{ active_signup }}" href="/signup/{{ lan }}">Signup</a>
+            <a class="{{ active_login }}" href="/login/{{ lan }}">Login</a>
         {% else %}
             {% if g.is_session and session['user']['user_is_admin'] == 1 %}
-                <a href="/admin">Admin</a>
+                <a href="/admin/{{ lan }}">Admin</a>
             {% endif %}
-            <a href="/profile">Profile</a>
-            <a class="{{ active_login }}" href="/logout">Logout</a>
+            <a href="/profile/{{ lan }}">Profile</a>
+            <a class="{{ active_login }}" href="/logout/{{ lan }}">Logout</a>
         {% endif %}
     </div>
 </nav>

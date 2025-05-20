@@ -59,8 +59,11 @@ def disable_cache(response):
 ##############################
 # ***index***
 @app.get("/")
-def view_index():
+@app.get("/<lan>")
+def view_index(lan):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
         db, cursor = x.db()
         q = """
         SELECT items.*, (
@@ -88,7 +91,7 @@ def view_index():
         with open("rates.txt", "r") as file:
             rates = json.loads(file.read())
         
-        return render_template("view_index.html", title="Skatespots CPH", items=items, images=images, rates=rates), 200
+        return render_template("view_index.html", title="Skatespots CPH", items=items, images=images, rates=rates, lan=lan, languages=languages), 200
 
     except Exception as ex:
         ic(ex)
@@ -103,8 +106,12 @@ def view_index():
 ##############################
 # ***item get***
 @app.get("/items/<item_pk>")
-def get_item_by_pk(item_pk):
+@app.get("/items/<item_pk>/<lan>")
+def get_item_by_pk(item_pk, lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         db, cursor = x.db()
 
         # Hent selve item
@@ -121,7 +128,7 @@ def get_item_by_pk(item_pk):
         with open("rates.txt", "r") as file:
             rates = json.loads(file.read())
 
-        html_item = render_template("_item.html", item=item, images=images, rates=rates)
+        html_item = render_template("_item.html", item=item, images=images, rates=rates, lan=lan, languages=languages)
 
         return f"""
             <mixhtml mix-replace="#item">
@@ -131,21 +138,22 @@ def get_item_by_pk(item_pk):
 
     except Exception as ex:
         ic(ex)
-        return """
+        return f"""
             <mixhtml mix-top="body">
-                ups
+                {getattr(languages, f"{lan}_dry_unknown_error")}
             </mixhtml>
         """, 500
 
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
 
 ##############################
 # ***item pagination***
 @app.get("/items/page/<page_number>")
-def get_items_by_page(page_number):
+@app.get("/items/page/<page_number>/<lan>")
+def get_items_by_page(page_number, lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         page_number = x.validate_page_number(page_number)
         items_per_page = 2
         offset = (page_number - 1) * items_per_page
@@ -175,11 +183,11 @@ def get_items_by_page(page_number):
 
         html = ""
         for item in items[:items_per_page]:
-            html += render_template("_item_mini.html", item=item, rates=rates)
+            html += render_template("_item_mini.html", item=item, rates=rates, lan=lan, languages=languages)
 
         button = ""
         if len(items) == extra_item:
-            button = render_template("_button_more_items.html", page_number=page_number + 1)
+            button = render_template("_button_more_items.html", page_number=page_number + 1, lan=lan, languages=languages)
 
         return f"""
             <mixhtml mix-bottom="#items">
@@ -197,21 +205,17 @@ def get_items_by_page(page_number):
         ic(ex)
 
         if "skatespots_ex page_number" in str(ex):
-            return """
+            return f"""
                 <mixhtml mix-top="body">
-                    page number invalid
+                    {getattr(languages, f"{lan}_pagination_invalid_page")}
                 </mixhtml>
             """, 400
 
-        return """
+        return f"""
             <mixhtml mix-top="body">
-                ups
+                {getattr(languages, f"{lan}_dry_unknown_error")}
             </mixhtml>
         """, 500
-
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
 
 ##############################
 # ***item post***
@@ -775,9 +779,14 @@ def login(lan):
 ##############################
 # ***logout get***
 @app.get("/logout")
-def logout():
-    session.pop("user")
-    return redirect(url_for("show_login")), 302
+@app.get("/logout/<lan>")
+def logout(lan="en"):
+    session.pop("user", None)  # sikre at der ikke opstår fejl hvis user ikke findes
+
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+
+    return redirect(url_for("show_login", lan=lan)), 302
 
 ##############################
 # ***admin get***
@@ -1114,21 +1123,27 @@ def admin_unblock_item(lan="en"):
 ##############################
 # ***forgot password get***
 @app.get("/forgot-password")
-def show_forgot_password():
-    return render_template("forgot_password.html", old_values={}), 200
+@app.get("/forgot-password/<lan>")
+def show_forgot_password(lan="en"):
+    languages_allowed = ["en", "dk"]
+    if lan not in languages_allowed: lan = "en"
+    return render_template("forgot_password.html", old_values={}, lan=lan, languages=languages), 200
+
 
 ##############################
 # ***forgot password post***
-@app.post("/forgot-password")
-def forgot_password():
+@app.post("/forgot-password/<lan>")
+def forgot_password(lan="en"):
     try:
+        languages_allowed = ["en", "dk"]
+        if lan not in languages_allowed: lan = "en"
+
         user_email = request.form.get("user_email", "").strip()
 
-        # Valider email med regex
         if not re.match(r"^[^@]+@[^@]+\.[^@]+$", user_email):
-            return """
+            return f"""
             <mixhtml mix-update="#form-feedback">
-              <div class="alert error">Enter a valid email address.</div>
+              <div class="alert error">{getattr(languages, f'{lan}_forgot_invalid_email')}</div>
             </mixhtml>
             """, 400
 
@@ -1150,26 +1165,33 @@ def forgot_password():
             db.commit()
             x.send_reset_email(user_email, reset_key)
 
-        return """
+        return f"""
         <mixhtml mix-update="#form-feedback">
           <div class="alert success" mix-ttl="4000">
-            If your email exists, we've sent a reset link.
+            {getattr(languages, f'{lan}_forgot_email_sent')}
           </div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">Send reset link</mixhtml>
+        <mixhtml mix-function="resetButtonText">
+          {getattr(languages, f'{lan}_forgot_button_default')}
+        </mixhtml>
         """, 200
 
     except Exception as ex:
         return f"""
         <mixhtml mix-update="#form-feedback">
-          <div class="alert error">Something went wrong: {str(ex)}</div>
+          <div class="alert error">
+            {getattr(languages, f'{lan}_dry_unknown_error').replace("{str(ex)}", str(ex))}
+          </div>
         </mixhtml>
-        <mixhtml mix-function="resetButtonText">Send reset link</mixhtml>
+        <mixhtml mix-function="resetButtonText">
+          {getattr(languages, f'{lan}_forgot_button_default')}
+        </mixhtml>
         """, 500
 
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
 
 ##############################
 # ***verify get***
