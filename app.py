@@ -22,6 +22,26 @@ Session(app)
 def before_request():
     g.is_session = "user" in session
 
+#     @app.before_request
+# def before_request():
+#     g.is_session = "user" in session
+
+#     #valg af language
+#     lan = request.view_args.get("lan") if request.view_args else None
+#     if lan not in ["en", "dk"]:
+#         lan = session.get("lan", "en")
+#     else:
+#         session["lan"] = lan
+
+#     g.lan = lan
+
+# @app.post("/set-language/<lan>")
+# def set_language(lan):
+#     if lan not in ["en", "dk"]:
+#         lan = "en"
+#     session["lan"] = lan
+#     return "", 204
+
 ##############################
 # ***rates***
 @app.get("/rates")
@@ -321,7 +341,6 @@ def post_item(lan):
                     <img class="uploaded_imgs_profile"
                          src="/static/uploads/{img['image_name']}"
                          alt="{img['image_name']}">
-                    <button mix-delete="/images/{img['image_pk']}/{lan}">{getattr(languages, f"{lan}_profile_delete_image")}</button>
                 </div>
             """
         item_html += "</div></div>"
