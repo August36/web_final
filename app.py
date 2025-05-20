@@ -1133,7 +1133,7 @@ def show_forgot_password(lan="en"):
 ##############################
 # ***forgot password post***
 @app.post("/forgot-password/<lan>")
-def forgot_password(lan="en"):
+def forgot_password(lan):
     try:
         languages_allowed = ["en", "dk"]
         if lan not in languages_allowed: lan = "en"
