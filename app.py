@@ -337,7 +337,7 @@ def post_item(lan):
         )
 
         return f"""
-        <mixhtml mix-replace="#form-feedback">
+        <mixhtml mix-after="#item-form">
           <div class='alert success' mix-ttl="3000">
             {getattr(languages, f"{lan}_upload_item_success")}
           </div>
