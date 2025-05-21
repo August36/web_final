@@ -1,3 +1,5 @@
+{% include "_header.html" %}
+
 <div id="item">
     <div>
         <p>
@@ -15,9 +17,13 @@
         <div>
             {{ "{:,.0f}".format(item.item_price|float * rates.rates.DKK) }} DKK
         </div>
+        <!-- If statement to remove the link if it's opened in a new window -->
+            {% if not request.path.startswith('/items/') %}
             <a href="/items/{{ item.item_pk }}/{{ lan }}" target="_blank">
                 {{ languages[lan~'_item_open_window'] }}
             </a>
+            {% endif %}
+
     </div>
     <div id="img-wrapper">
         {% for image in images %}
@@ -25,3 +31,5 @@
         {% endfor %}
     </div>
 </div>
+
+{% include "_footer_base.html" %}

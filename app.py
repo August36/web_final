@@ -156,7 +156,7 @@ def get_item_by_pk(item_pk, lan="en"):
         with open("rates.txt", "r") as file:
             rates = json.loads(file.read())
 
-        html_item = render_template("_item.html", item=item, images=images, rates=rates, lan=lan, languages=languages)
+        html_item = render_template("_item.html", item=item, images=images, rates=rates, lan=lan, languages=languages, request=request)
 
         return f"""
             <mixhtml mix-replace="#item">
@@ -1536,6 +1536,9 @@ def delete_profile(lan="en"):
 
 ##############################
 # ***profile delete***
+# Mabye this route should use delete instead of post
+# But html forms arent supported with delete
+# and with post the users password can be send and validated
 @app.post("/profile/delete/<lan>")
 def confirm_delete_profile(lan):
     try:
