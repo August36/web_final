@@ -1,0 +1,103 @@
+
+/* H1 og H2 */
+#profile h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+#profile h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+/* Personal info list */
+#profile ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#profile ul li {
+  margin-bottom: 0.5rem;
+}
+
+/* Links */
+#profile p a {
+  color: #0077cc;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+#profile p a:hover {
+  text-decoration: underline;
+}
+
+/* Item section */
+#items {
+  margin-top: 2rem;
+}
+
+.item-card, #personal-info-card {
+  background-color: #fff;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.item-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.item-card p {
+  margin-bottom: 0.5rem;
+}
+
+.item-card a {
+  font-weight: bold;
+  color: #0077cc;
+}
+
+.item-card button {
+  background: none;
+  border: none;
+  color: #0077cc;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  text-decoration: underline;
+}
+
+.item-card button:hover {
+  color: #005fa3;
+  text-decoration: none;
+}
+
+.divider {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+/* Uploadeded imgs */
+.uploaded_imgs_profile {
+  width: 100%;
+  max-width: 200px;
+  border-radius: 10px;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.item-images {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+

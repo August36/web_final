@@ -1,0 +1,93 @@
+#admin-main {
+  padding: 2rem 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+
+/* USER-CARDS */
+.user-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.user-card p {
+  margin: 0.3rem 0;
+}
+
+/* ITEM-CARDS */
+.item-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.item-card p {
+  margin: 0.3rem 0;
+}
+
+/* KNAPPER */
+button.btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem auto 0;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #f4f4f4;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+button.btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* BLOKÉR = rød nuance */
+button.block {
+  background-color: #fce3e3;
+  border: 1px solid #e57373;
+  color: #c62828;
+}
+
+button.block:hover {
+  background-color: #f8d7d7;
+}
+
+/* OPHÆV BLOKÉR = grøn nuance */
+button.unblock {
+  background-color: #e0f7e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+button.unblock:hover {
+  background-color: #d0f0dd;
+}
+
+/* RESPONSIVT */
+@media (max-width: 600px) {
+  .user-card,
+  .item-card {
+    padding: 1rem 0.8rem;
+  }
+
+  button.btn {
+    width: 100%;
+    font-size: 1rem;
+  }
+}

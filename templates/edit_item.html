@@ -1,6 +1,7 @@
 {% include "_header.html" %}
 {% include "_nav.html" %}
 
+<main id="edit-item">
 <h1>{{ languages[lan~'_edit_item_title'] }}</h1>
 
 <form mix-post="/items/{{ item.item_pk }}/{{ lan }}" class="edit-item-form">
@@ -54,5 +55,5 @@
 </form>
 
 <div id="form-feedback"></div>
-
+</main>
 {% include "_footer_base.html" %}

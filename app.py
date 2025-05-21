@@ -9,6 +9,8 @@ import json
 import re
 import requests
 import languages
+from datetime import datetime
+
 
 from icecream import ic
 ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
@@ -75,6 +77,12 @@ def disable_cache(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
+
+##############################
+# ***Format unix timestamp***
+@app.template_filter('datetimeformat')
+def datetimeformat(value, format="%d.%m.%Y"):
+    return datetime.fromtimestamp(value).strftime(format)
 
 ##############################
 # ***index***

@@ -5,12 +5,72 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
 body {
   width: 100%;
   height: 100vh;
   overflow-x: hidden;
   background-color: #f9f9f9;
   color: #333;
+}
+
+/* ################# */
+/* General styles */
+#edit-profile,
+#delete-profile,
+#edit-item,
+#login,
+#signup,
+#profile {
+  padding: 2rem 1rem;
+  font-size: 1.1rem;
+  color: #222;
+  max-width: 700px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+#edit-profile h1,
+#delete-profile h1,
+#edit-item h1,
+#login h1,
+#signup h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+#edit-profile p a,
+#delete-profile p a,
+#edit-item a {
+  color: #0077cc;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 2rem;
+}
+
+#edit-profile p a:hover,
+#delete-profile p a:hover,
+#edit-item a:hover {
+  text-decoration: underline;
+}
+
+button.block {
+  background-color: #fce3e3;
+  border: 1px solid #e57373;
+  color: #c62828;
+}
+
+button.block:hover {
+  background-color: #f8d7d7;
 }
 
 .ml {

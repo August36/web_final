@@ -71,3 +71,15 @@ function add_markers_to_map(data){
             .bindPopup(item.item_name)
     });
 }
+
+// Tjek om brugeren er på index-siden (med eller uden /en eller /dk)
+document.addEventListener("DOMContentLoaded", () => {
+  const searchContainer = document.getElementById("search_container");
+  const path = window.location.pathname;
+
+  const isIndex = path === "/" || path === "/en" || path === "/dk";
+
+  if (isIndex && searchContainer) {
+    searchContainer.classList.remove("hidden");
+  }
+});

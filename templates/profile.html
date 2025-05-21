@@ -11,17 +11,20 @@
   </div>
 
   <h2>{{ languages[lan~'_profile_personal_info'] }}</h2>
+  <div id="personal-info-card">
   <ul>
     <li><strong>{{ languages[lan~'_dry_username'] }}</strong> {{ user.user_username }}</li>
     <li><strong>{{ languages[lan~'_dry_name'] }}</strong> {{ user.user_name }} {{ user.user_last_name }}</li>
     <li><strong>{{ languages[lan~'_dry_email'] }}</strong> {{ user.user_email }}</li>
-    <li><strong>{{ languages[lan~'_profile_member_since'] }}</strong> {{ user.user_created_at }}</li>
+    <li><strong>{{ languages[lan~'_profile_member_since'] }}</strong> {{ user.user_created_at | datetimeformat }}</li>
   </ul>
-
+  
   <p>
-    <a href="{{ url_for('edit_profile') }}">{{ languages[lan~'_profile_edit'] }}</a> |
+    <a href="{{ url_for('edit_profile') }}">{{ languages[lan~'_profile_edit'] }}</a>
+    <span class="divider">|</span>
     <a href="{{ url_for('delete_profile') }}">{{ languages[lan~'_profile_delete'] }}</a>
   </p>
+  </div>
 
   <div id="form-errors">
     {% if errors %}
@@ -38,8 +41,8 @@
 
   <h2>{{ languages[lan~'_profile_upload_spot'] }}</h2>
 
-  <div id="form-feedback"></div>
   {% include "upload_item_form.html" %}
+  <div id="form-feedback"></div>
 
   <section id="items">
     <h2 id="items-h2">{{ languages[lan~'_profile_your_spots'] }}</h2>
@@ -55,12 +58,15 @@
         <h3>{{ item.item_name }}</h3>
         <p><strong>{{ languages[lan~'_dry_price'] }}</strong> {{ item.item_price }} DKK</p>
         <p><strong>{{ languages[lan~'_dry_address'] }}</strong> {{ item.item_address }}</p>
-        <p>{{ item.item_description }}</p>
+        <p><strong>{{ languages[lan~'_dry_description'] }}:</strong> {{ item.item_description }}</p>
 
+        <div class="item-actions">
         <a href="/items/{{ item.item_pk }}/edit">{{ languages[lan~'_profile_edit_spot'] }}</a>
+        <span class="divider">|</span>
         <button mix-delete="/items/{{ item.item_pk }}/{{ lan }}">
           {{ languages[lan~'_profile_delete_item_btn'] }} {{ item.item_name }}
         </button>
+        </div>
 
         <div class="item-images">
           {% for img in item.images %}
