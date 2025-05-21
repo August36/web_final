@@ -13,24 +13,6 @@ body {
   color: #333;
 }
 
-button {
-  width: 100%;
-  height: 3rem;
-  font-size: 1rem;
-  border: none;
-  outline: none;
-}
-
-form {
-  width: 50%;
-}
-form input,
-form button {
-  width: 100%;
-  height: 2.5rem;
-  outline: none;
-}
-
 .ml {
   margin-left: auto;
 }
@@ -40,14 +22,6 @@ form button {
   display: none !important;
 }
 
-input {
-  width: 400px;
-  height: 2.5rem;
-  padding: 0 5px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
 
 #mix-cover {
   position: fixed;
@@ -151,12 +125,21 @@ main#index .item img {
 }
 main#index #button_more_items {
   width: 50%;
+  height: 3rem;
+  border: none;
   margin: auto;
-  background-color: black;
-  color: white;
+  background-color: transparent;
+  border: 2px solid #333;
+  color: #333;
   margin-top: 1rem;
   border-radius: 10px;
   cursor: pointer;
+  font-size: 1.5rem;
+}
+
+main#index #button_more_items:hover {
+  background-color: #333;
+  color: #fff;
 }
 
 main#index #right{
