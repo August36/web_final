@@ -1,39 +1,41 @@
 <nav>
-    <a href="/{{ lan }}">
-        Spots
-    </a>
-
-    <div id="lang-switch-container">
+  <div id="nav-top">
+    <div id="left_nav">
+      <a href="/{{ lan }}" class="nav-link">Spots</a>
+      <div id="lang-switch-container">
         <button class="lang-switch" data-lang="dk">Dansk</button>
         <button class="lang-switch" data-lang="en">English</button>
+      </div>
     </div>
 
     <div id="search_container">
-        <input 
-        id="input_search" 
-        oninput="search()"
-        type="text" 
-        placeholder="{{ languages[lan~'_nav_search_placeholder'] }}"
-        name="q"
-        maxlength="50"
-        pattern=".{1,50}"
-        title="{{ languages[lan~'_nav_search_title'] }}"
-        required
-    >
-        <div id="search_results" class="hidden">
-        </div>
+      <div class="search-wrapper">
+          <input
+            id="input_search"
+            oninput="search()"
+            type="text"
+            placeholder="{{ languages[lan~'_nav_search_placeholder'] }}"
+            name="q"
+            maxlength="50"
+            pattern=".{1,50}"
+            title="{{ languages[lan~'_nav_search_title'] }}"
+            required
+          >
+          <div id="search_results" class="hidden"></div>
+      </div>
     </div>
 
-    <div>
-        {% if not g.is_session %}
-            <a class="{{ active_signup }}" href="/signup/{{ lan }}">Signup</a>
-            <a class="{{ active_login }}" href="/login/{{ lan }}">Login</a>
-        {% else %}
-            {% if g.is_session and session['user']['user_is_admin'] == 1 %}
-                <a href="/admin/{{ lan }}">Admin</a>
-            {% endif %}
-            <a href="/profile/{{ lan }}">Profile</a>
-            <a class="{{ active_login }}" href="/logout/{{ lan }}">Logout</a>
+    <div id="user-links">
+      {% if not g.is_session %}
+        <a class="nav-link {{ active_signup }}" href="/signup/{{ lan }}">Signup</a>
+        <a class="nav-link {{ active_login }}" href="/login/{{ lan }}">Login</a>
+      {% else %}
+        {% if g.is_session and session['user']['user_is_admin'] == 1 %}
+          <a class="nav-link" href="/admin/{{ lan }}">Admin</a>
         {% endif %}
+        <a class="nav-link" href="/profile/{{ lan }}">Profile</a>
+        <a class="nav-link {{ active_login }}" href="/logout/{{ lan }}">Logout</a>
+      {% endif %}
     </div>
+  </div>
 </nav>
