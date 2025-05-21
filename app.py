@@ -80,7 +80,7 @@ def disable_cache(response):
 # ***index***
 @app.get("/")
 @app.get("/<lan>")
-def view_index(lan):
+def view_index(lan="en"):
     try:
         languages_allowed = ["en", "dk"]
         if lan not in languages_allowed: lan = "en"
