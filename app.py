@@ -394,8 +394,8 @@ def post_item(lan):
 
 
 ##############################
-# ***item edit post***
-@app.post("/items/<item_pk>/<lan>")
+# ***item edit patch***
+@app.patch("/items/<item_pk>/<lan>")
 def edit_item_post(item_pk, lan):
     try:
         languages_allowed = ["en", "dk"]
@@ -519,36 +519,36 @@ def edit_item_page(item_pk, lan="en"):
 
 ##############################
 # ***image delete***
-@app.delete("/images/<image_pk>/<lan>")
-def delete_image(image_pk, lan):
-    try:
-        languages_allowed = ["en", "dk"]
-        if lan not in languages_allowed: lan = "en"
+# @app.delete("/images/<image_pk>/<lan>")
+# def delete_image(image_pk, lan):
+#     try:
+#         languages_allowed = ["en", "dk"]
+#         if lan not in languages_allowed: lan = "en"
 
-        image_pk = x.validate_image_pk(image_pk)
-        user = x.validate_user_logged()
+#         image_pk = x.validate_image_pk(image_pk)
+#         user = x.validate_user_logged()
 
-        db, cursor = x.db()
-        q = "DELETE FROM images WHERE image_pk = %s"
-        cursor.execute(q, (image_pk,))
-        db.commit()
+#         db, cursor = x.db()
+#         q = "DELETE FROM images WHERE image_pk = %s"
+#         cursor.execute(q, (image_pk,))
+#         db.commit()
 
-        return f"""
-        <mixhtml mix-remove="#x{image_pk}"></mixhtml>
-        <mixhtml mix-after="#items-h2">
-        <div class='alert success' mix-ttl="3000">
-            {getattr(languages, f"{lan}_profile_image_deleted")}
-        </div>
-        </mixhtml>
-        """, 200
+#         return f"""
+#         <mixhtml mix-remove="#x{image_pk}"></mixhtml>
+#         <mixhtml mix-after="#items-h2">
+#         <div class='alert success' mix-ttl="3000">
+#             {getattr(languages, f"{lan}_profile_image_deleted")}
+#         </div>
+#         </mixhtml>
+#         """, 200
 
-    except Exception as ex:
-        ic(ex)
-        return "", 500
+#     except Exception as ex:
+#         ic(ex)
+#         return "", 500
 
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
+#     finally:
+#         if "cursor" in locals(): cursor.close()
+#         if "db" in locals(): db.close()
 
 
 ##############################
@@ -1434,8 +1434,8 @@ def edit_profile(lan="en"):
         return str(ex), 500
 
 ##############################
-# ***profile edit post***
-@app.post("/profile/edit/<lan>")
+# ***profile edit patch***
+@app.patch("/profile/edit/<lan>")
 def update_profile(lan):
     try:
         languages_allowed = ["en", "dk"]
@@ -1535,7 +1535,7 @@ def delete_profile(lan="en"):
 
 
 ##############################
-# ***profile delete post***
+# ***profile delete***
 @app.post("/profile/delete/<lan>")
 def confirm_delete_profile(lan):
     try:
