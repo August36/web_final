@@ -107,8 +107,8 @@ dk_login_error_credentials = "Forkert loginoplysninger"
 en_login_error_generic = "Something went wrong: {str(ex)}"
 dk_login_error_generic = "Noget gik galt: {str(ex)}"
 
-en_signup_success_verify = "Thank you for signing up. Please verify your email before logging in."
-dk_signup_success_verify = "Tak for din tilmelding. Bekræft venligst din email, før du logger ind."
+en_signup_success = "Thank you for signing up. Please verify your email before logging in."
+dk_signup_success = "Tak for din tilmelding. Bekræft venligst din email, før du logger ind."
 
 en_verify_success = "Your email is now verified. You can log in."
 dk_verify_success = "Din email er nu bekræftet. Du kan logge ind."
