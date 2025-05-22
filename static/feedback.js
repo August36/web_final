@@ -1,7 +1,8 @@
 // Validerer alle mix-check felter før submit
 document.addEventListener("submit", function (e) {
   const form = e.target;
-  if (!form.hasAttribute("mix-post")) return;
+  const mixMethods = ["mix-post", "mix-patch", "mix-put", "mix-delete"];
+  if (!mixMethods.some(attr => form.hasAttribute(attr))) return;
 
   let errors = [];
 
@@ -26,7 +27,7 @@ document.addEventListener("submit", function (e) {
         </ul>
       </div>
     `;
-    const fb = document.querySelector("#form-feedback");
+    const fb = document.querySelector(".form-feedback");
     if (fb) fb.innerHTML = errorHtml;
 
     e.preventDefault(); // Stop MixHTML submit
@@ -49,7 +50,7 @@ document.querySelectorAll("[mix-check]").forEach(input => {
       });
 
       if (allValid) {
-        const fb = document.querySelector("#form-feedback");
+        const fb = document.querySelector(".form-feedback");
         if (fb) fb.innerHTML = "";
       }
     }

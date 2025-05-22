@@ -1,14 +1,14 @@
 form {
-  width: 100%;
-  max-width: 700px;
+  width: 600px;
   margin: 2rem auto;
-  padding: 1rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
   box-sizing: border-box;
 }
 
+/* Input styles */
 form input,
 form textarea,
 form select {
@@ -18,16 +18,15 @@ form select {
   border-radius: 10px;
   border: 1px solid #ccc;
   font-size: 1.1rem;
-  outline: none;
   box-sizing: border-box;
 }
 
 form textarea {
   min-height: 120px;
   resize: vertical;
-  padding: 1rem;
 }
 
+/* Button */
 form button,
 form input[type="submit"] {
   width: 100%;
@@ -48,17 +47,38 @@ form input[type="submit"]:hover {
   background-color: #e0e0e0;
 }
 
-form .ml {
-  margin-left: auto;
+/* Feedback */
+.form-feedback {
+  width: 100%;
+  max-width: 600px;
+  min-height: 2.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
-form .hidden {
-  display: none !important;
+/* Responsiveness */
+@media (max-width: 900px) {
+  form {
+    width: 500px;
+  }
+
+  .form-feedback{
+    max-width: 500px;
+  }
 }
 
 @media (max-width: 600px) {
   form {
-    padding: 1rem 0.5rem;
+    max-width: 450px;
+    padding: 1rem;
+    width: 450px;
+  }
+
+  .form-feedback{
+    max-width: 450px;
   }
 
   form input,
@@ -66,8 +86,19 @@ form .hidden {
   form select,
   form button,
   form input[type="submit"] {
-    font-size: 1.2rem;
+    font-size: 1rem;
     height: auto;
-    padding: 1rem;
+    padding: 0.8rem;
   }
+}
+
+@media (max-width: 450px) {
+  form {
+    width: 280px;
+    max-width: 280px;
+  }
+
+  .form-feedback{
+  max-width: 100%;
+}
 }

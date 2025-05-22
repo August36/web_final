@@ -279,7 +279,7 @@ def post_item(lan):
                 + "</ul>"
             )
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               {error_html}
             </mixhtml>
             <mixhtml mix-function="resetButtonText">
@@ -380,7 +380,7 @@ def post_item(lan):
     except Exception as ex:
         ic(ex)
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_upload_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         <mixhtml mix-function="resetButtonText">
@@ -420,19 +420,18 @@ def edit_item_post(item_pk, lan):
             except Exception as ex:
                 form_errors[field] = str(ex)
 
-        #TODO: Feedback vises ikke fix senere
-        # if form_errors:
-        #     error_html = (
-        #         "<ul class='alert error'>"
-        #         + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
-        #         + "</ul>"
-        #     )
-        #     return f"""
-        #     <mixhtml mix-update="#form-feedback">
-        #       {error_html}
-        #     </mixhtml>
-        #     <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
-        #     """, 400
+        if form_errors:
+            error_html = (
+                "<ul class='alert error'>"
+                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+                + "</ul>"
+            )
+            return f"""
+            <mixhtml mix-update=".form-feedback">
+              {error_html}
+            </mixhtml>
+            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
+            """, 400
 
         db, cursor = x.db()
 
@@ -470,7 +469,7 @@ def edit_item_post(item_pk, lan):
     except Exception as ex:
         ic(ex)
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_profile_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
@@ -667,55 +666,55 @@ def signup(lan):
 
         if "username" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_username_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "first name" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_first_name_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "last name" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_last_name_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "Invalid email" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_email_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "password" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_password_invalid")}</div>
             </mixhtml>
             """, 400
 
         if "user_email" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_email_exists")}</div>
             </mixhtml>
             """, 400
 
         if "user_username" in str(ex):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_signup_username_exists")}</div>
             </mixhtml>
             """, 400
 
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_signup_unknown_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 400
@@ -769,14 +768,14 @@ def login(lan):
 
         if not user["user_verified"]:
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_login_error_verify_email")}</div>
             </mixhtml>
             """, 403
 
         if user["user_blocked_at"] != 0:
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_login_error_blocked")}</div>
             </mixhtml>
             """, 403
@@ -795,7 +794,7 @@ def login(lan):
     except Exception as ex:
         ic(ex)
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{str(ex)}</div>
         </mixhtml>
         """, 400
@@ -1170,7 +1169,7 @@ def forgot_password(lan):
 
         if not re.match(r"^[^@]+@[^@]+\.[^@]+$", user_email):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class="alert error">{getattr(languages, f'{lan}_forgot_invalid_email')}</div>
             </mixhtml>
             """, 400
@@ -1194,7 +1193,7 @@ def forgot_password(lan):
             x.send_reset_email(user_email, reset_key)
 
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class="alert success" mix-ttl="4000">
             {getattr(languages, f'{lan}_forgot_email_sent')}
           </div>
@@ -1206,7 +1205,7 @@ def forgot_password(lan):
 
     except Exception as ex:
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class="alert error">
             {getattr(languages, f'{lan}_dry_unknown_error').replace("{str(ex)}", str(ex))}
           </div>
@@ -1285,7 +1284,7 @@ def reset_password(reset_key, lan="en"):
             new_password = x.validate_user_password()
         except Exception as ex:
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{str(ex)}</div>
             </mixhtml>
             <mixhtml mix-function="resetButtonText">
@@ -1301,7 +1300,7 @@ def reset_password(reset_key, lan="en"):
 
         if not user:
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f'{lan}_reset_password_invalid')}</div>
             </mixhtml>
             """, 403
@@ -1309,7 +1308,7 @@ def reset_password(reset_key, lan="en"):
         now = int(time.time())
         if user["user_reset_requested_at"] < now - 3600:
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f'{lan}_reset_password_expired')}</div>
             </mixhtml>
             """, 403
@@ -1327,7 +1326,7 @@ def reset_password(reset_key, lan="en"):
 
         if cursor.rowcount != 1:
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f'{lan}_reset_password_invalid')}</div>
             </mixhtml>
             <mixhtml mix-function="resetButtonText">
@@ -1343,7 +1342,7 @@ def reset_password(reset_key, lan="en"):
 
     except Exception as ex:
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{getattr(languages, f'{lan}_reset_password_error').replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         <mixhtml mix-function="resetButtonText">
@@ -1460,19 +1459,18 @@ def update_profile(lan):
             except Exception as ex:
                 form_errors[field] = str(ex)
 
-        #TODO: Feedback vises ikke fix senere
-        # if form_errors:
-        #     error_html = (
-        #         "<ul class='alert error'>"
-        #         + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
-        #         + "</ul>"
-        #     )
-        #     return f"""
-        #     <mixhtml mix-update="#edit-profile-feedback">
-        #       {error_html}
-        #     </mixhtml>
-        #     <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
-        #     """, 400
+        if form_errors:
+            error_html = (
+                "<ul class='alert error'>"
+                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+                + "</ul>"
+            )
+            return f"""
+            <mixhtml mix-update=".form-feedback">
+              {error_html}
+            </mixhtml>
+            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
+            """, 400
 
         # Update DB
         db, cursor = x.db()
@@ -1504,7 +1502,7 @@ def update_profile(lan):
     except Exception as ex:
         ic(ex)
         return f"""
-        <mixhtml mix-update="#edit-profile-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_profile_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
@@ -1562,7 +1560,7 @@ def confirm_delete_profile(lan):
 
         if not result or not check_password_hash(result["user_password"], user_password):
             return f"""
-            <mixhtml mix-update="#form-feedback">
+            <mixhtml mix-update=".form-feedback">
               <div class='alert error'>{getattr(languages, f"{lan}_delete_profile_invalid_password")}</div>
             </mixhtml>
             """, 403
@@ -1581,7 +1579,7 @@ def confirm_delete_profile(lan):
 
     except Exception as ex:
         return f"""
-        <mixhtml mix-update="#form-feedback">
+        <mixhtml mix-update=".form-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_delete_profile_unknown_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         """, 500

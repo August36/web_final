@@ -67,8 +67,8 @@ dk_button_more_items = "Vis mere"
 en_pagination_invalid_page = "Page number is invalid"
 dk_pagination_invalid_page = "Sidetal er ugyldigt"
 
-en_nav_search_placeholder = "Search by spot name"
-dk_nav_search_placeholder = "Søg efter spot navn"
+en_nav_search_placeholder = "Search for spots"
+dk_nav_search_placeholder = "Søg efter spots"
 
 en_nav_search_title = "Enter up to 50 characters"
 dk_nav_search_title = "Indtast op til 50 tegn"
