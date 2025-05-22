@@ -8,7 +8,7 @@
 #profile h2 {
   font-size: 1.5rem;
   margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   border-bottom: 2px solid #eee;
   padding-bottom: 0.3rem;
 }
@@ -35,8 +35,7 @@
   text-decoration: underline;
 }
 
-/* Item section */
-#items {
+#profile_items {
   margin-top: 2rem;
 }
 

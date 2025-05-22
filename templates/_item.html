@@ -1,7 +1,7 @@
 {% include "_header.html" %}
 
 <div id="item">
-    <div>
+    <div class="item-info">
         <p>
             {{ item.item_name }}
         </p>
@@ -17,19 +17,17 @@
         <div>
             {{ "{:,.0f}".format(item.item_price|float * rates.rates.DKK) }} DKK
         </div>
-        <!-- If statement to remove the link if it's opened in a new window -->
-            {% if not request.path.startswith('/items/') %}
-            <a href="/items/{{ item.item_pk }}/{{ lan }}" target="_blank">
-                {{ languages[lan~'_item_open_window'] }}
-            </a>
-            {% endif %}
-
     </div>
     <div id="img-wrapper">
         {% for image in images %}
         <img src="{{ url_for('static', filename='uploads/' + image.image_name) }}" alt="{{ item.item_name }}">
         {% endfor %}
     </div>
+</div>
+
+<div id="img-modal" class="modal hidden">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="modal-img">
 </div>
 
 {% include "_footer_base.html" %}

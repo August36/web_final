@@ -1,12 +1,16 @@
+{% include "_header.html" %}
+
 <a href="/items/{{ item.item_pk }}/{{ lan }}" mix-get class="item">
     <img src="{{ url_for('static', filename='uploads/'+ item.item_image) }}" alt="{{ item.item_name }}">
-    <p>
-        {{ item.item_name }}
-    </p>
-    <div>
-        {{ "{:,}".format(item.item_price) }} USD
-    </div>
-    <div>
-        {{ "{:,.0f}".format(item.item_price|float * rates.rates.DKK) }} DKK
+    <div class="info-wrapper">
+        <p>
+            {{ item.item_name }}
+        </p>
+        <div>
+            {{ "{:,}".format(item.item_price) }} USD
+        </div>
+        <div>
+            {{ "{:,.0f}".format(item.item_price|float * rates.rates.DKK) }} DKK
+        </div>
     </div>
 </a>

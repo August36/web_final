@@ -420,18 +420,19 @@ def edit_item_post(item_pk, lan):
             except Exception as ex:
                 form_errors[field] = str(ex)
 
-        if form_errors:
-            error_html = (
-                "<ul class='alert error'>"
-                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
-                + "</ul>"
-            )
-            return f"""
-            <mixhtml mix-update="#form-feedback">
-              {error_html}
-            </mixhtml>
-            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
-            """, 400
+        #TODO: Feedback vises ikke fix senere
+        # if form_errors:
+        #     error_html = (
+        #         "<ul class='alert error'>"
+        #         + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+        #         + "</ul>"
+        #     )
+        #     return f"""
+        #     <mixhtml mix-update="#form-feedback">
+        #       {error_html}
+        #     </mixhtml>
+        #     <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_dry_save_changes")}</mixhtml>
+        #     """, 400
 
         db, cursor = x.db()
 
@@ -1459,18 +1460,19 @@ def update_profile(lan):
             except Exception as ex:
                 form_errors[field] = str(ex)
 
-        if form_errors:
-            error_html = (
-                "<ul class='alert error'>"
-                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
-                + "</ul>"
-            )
-            return f"""
-            <mixhtml mix-update="#edit-profile-feedback">
-              {error_html}
-            </mixhtml>
-            <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
-            """, 400
+        #TODO: Feedback vises ikke fix senere
+        # if form_errors:
+        #     error_html = (
+        #         "<ul class='alert error'>"
+        #         + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+        #         + "</ul>"
+        #     )
+        #     return f"""
+        #     <mixhtml mix-update="#edit-profile-feedback">
+        #       {error_html}
+        #     </mixhtml>
+        #     <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
+        #     """, 400
 
         # Update DB
         db, cursor = x.db()
