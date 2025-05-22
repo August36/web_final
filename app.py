@@ -1466,7 +1466,7 @@ def update_profile(lan):
                 + "</ul>"
             )
             return f"""
-            <mixhtml mix-update="#profile-feedback">
+            <mixhtml mix-update="#edit-profile-feedback">
               {error_html}
             </mixhtml>
             <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
@@ -1502,7 +1502,7 @@ def update_profile(lan):
     except Exception as ex:
         ic(ex)
         return f"""
-        <mixhtml mix-update="#profile-feedback">
+        <mixhtml mix-update="#edit-profile-feedback">
           <div class='alert error'>{getattr(languages, f"{lan}_profile_item_error").replace("{str(ex)}", str(ex))}</div>
         </mixhtml>
         <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
