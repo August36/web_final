@@ -1,22 +1,24 @@
-{% include "_header.html" %}
-{% include "_nav.html" %}
-
-<main id="index">
-    <section id="map"></section>
-
-    <section id="items_more">
-        <div id="items">
-            {% for item in items: %}
-                {% include "_item_mini.html" %}
-            {% endfor %}
-        </div>
-        {% include "_button_more_items.html" %}
-    </section>
-
-    <section id="right">
-        {% set item = items[0] %}
-        {% include "_item.html" %}
-    </section>
-</main>
-
-{% include "_footer_index.html" %}
+<div id="page">
+    {% include "_header.html" %}
+    {% include "_nav.html" %}
+    
+    <main id="index">
+        <section id="map"></section>
+    
+        <section id="items_more">
+            <div id="items">
+                {% for item in items: %}
+                    {% include "_item_mini.html" %}
+                {% endfor %}
+            </div>
+            {% include "_button_more_items.html" %}
+        </section>
+    
+        <section id="right">
+            {% set item = items[0] %}
+            {% include "_item.html" %}
+        </section>
+    </main>
+    
+    {% include "_footer_index.html" %}
+</div>

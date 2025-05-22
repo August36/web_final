@@ -8,7 +8,10 @@
 
 body {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   /* overflow-x: hidden; */
   background-color: #f9f9f9;
   color: #333;
@@ -67,6 +70,12 @@ h2 {
 #delete-profile p a:hover,
 #edit-item a:hover {
   text-decoration: underline;
+}
+
+#page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 /* === BUTTONS === */
@@ -145,8 +154,8 @@ main#index {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; /* tre lige brede kolonner */
   gap: 2rem;  
-  padding: 1rem 2rem;
-  height: calc(100vh - 4rem);
+  padding: 1rem 1rem;
+  min-height: calc(100vh - 4rem);
   box-sizing: border-box;
 }
 
@@ -315,7 +324,28 @@ main#index .custom-marker {
   cursor: pointer;
 }
 
+footer{
+    display: flex;
+    justify-content: center;
+    height: 2rem;
+    display: flex;
+    color: white;
+    background-color: black;
+    text-align: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
 /* === MEDIA QUERIES === */
+@media (max-width: 1200px) {
+  main#index {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;  
+  padding: 1rem 0.5rem;
+}
+}
+
 @media (max-width: 850px) {
   main#index {
     display: flex;
@@ -325,7 +355,7 @@ main#index .custom-marker {
   }
 
   main#index #map {
-    height: 300px;
+    height: 400px;
     width: 100%;
   }
 
@@ -335,22 +365,22 @@ main#index .custom-marker {
 
   main#index #right {
     order: 3;
-    padding: 1rem 0;
+    padding: 0;
   }
 
   main#index #button_more_items {
-    width: 100%;
+    width: 50%;
     font-size: 1.2rem;
   }
 
   .item {
-    margin: 0 2rem;
+    margin: 0 auto;
   }
 
   .item img {
     height: 300px;
-    width: 70%;
-    margin: 2rem auto 0;
+    width: 100%;
+    margin: 2rem auto;
   }
 
   #img-wrapper {
@@ -364,6 +394,11 @@ main#index .custom-marker {
 }
 
 @media (max-width: 450px) {
+  main#index #map {
+  height: 300px;
+  width: 100%;
+  }
+  
   .item img {
     width: 90%;
   }
