@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("modal.js loaded");
 
   const imgModal = document.getElementById("img-modal");
   const imgModalImg = document.getElementById("modal-img");

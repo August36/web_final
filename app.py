@@ -11,7 +11,6 @@ import requests
 import languages
 from datetime import datetime
 
-
 from icecream import ic
 ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
 
@@ -23,26 +22,6 @@ Session(app)
 @app.before_request
 def before_request():
     g.is_session = "user" in session
-
-#     @app.before_request
-# def before_request():
-#     g.is_session = "user" in session
-
-#     #valg af language
-#     lan = request.view_args.get("lan") if request.view_args else None
-#     if lan not in ["en", "dk"]:
-#         lan = session.get("lan", "en")
-#     else:
-#         session["lan"] = lan
-
-#     g.lan = lan
-
-# @app.post("/set-language/<lan>")
-# def set_language(lan):
-#     if lan not in ["en", "dk"]:
-#         lan = "en"
-#     session["lan"] = lan
-#     return "", 204
 
 ##############################
 # ***rates***
@@ -129,8 +108,6 @@ def view_index(lan="en"):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
-
 ##############################
 # ***item get***
 @app.get("/items/<item_pk>")
@@ -171,7 +148,6 @@ def get_item_by_pk(item_pk, lan="en"):
                 {getattr(languages, f"{lan}_dry_unknown_error")}
             </mixhtml>
         """, 500
-
 
 ##############################
 # ***item pagination***
@@ -392,7 +368,6 @@ def post_item(lan):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***item edit patch***
 @app.patch("/items/<item_pk>/<lan>")
@@ -479,7 +454,6 @@ def edit_item_post(item_pk, lan):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***item edit get***
 @app.get("/items/<item_pk>/edit")
@@ -516,7 +490,6 @@ def edit_item_page(item_pk, lan="en"):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***image delete***
 # @app.delete("/images/<image_pk>/<lan>")
@@ -549,7 +522,6 @@ def edit_item_page(item_pk, lan="en"):
 #     finally:
 #         if "cursor" in locals(): cursor.close()
 #         if "db" in locals(): db.close()
-
 
 ##############################
 # ***item delete***
@@ -591,8 +563,6 @@ def delete_item(item_pk, lan):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
-
 ##############################
 # ***signup get***
 @app.get("/signup")
@@ -615,8 +585,6 @@ def show_signup(lan="en"):
         ), 200
     except Exception as ex:
         return str(ex), 500
-
-
 
 ##############################
 # ***signup post***
@@ -723,7 +691,6 @@ def signup(lan):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***login get***
 @app.get("/login")
@@ -745,7 +712,6 @@ def show_login(lan="en"):
         lan=lan,
         languages=languages
     ), 200
-
 
 ##############################
 # ***login post***
@@ -808,7 +774,7 @@ def login(lan):
 @app.get("/logout")
 @app.get("/logout/<lan>")
 def logout(lan="en"):
-    session.pop("user", None)  # sikre at der ikke opstår fejl hvis user ikke findes
+    session.pop("user", None)
 
     languages_allowed = ["en", "dk"]
     if lan not in languages_allowed: lan = "en"
@@ -856,7 +822,6 @@ def view_admin(lan="en"):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
 
 ##############################
 # ***admin block user***
@@ -925,7 +890,6 @@ def admin_block_user(lan="en"):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***admin unblock user***
 @app.patch("/admin/unblock-user")
@@ -993,7 +957,6 @@ def admin_unblock_user(lan="en"):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
 
 ##############################
 # ***admin block item***
@@ -1070,7 +1033,6 @@ def admin_block_item(lan="en"):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***admin unblock item***
 @app.patch("/admin/unblock-item")
@@ -1146,7 +1108,6 @@ def admin_unblock_item(lan="en"):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***forgot password get***
 @app.get("/forgot-password")
@@ -1155,7 +1116,6 @@ def show_forgot_password(lan="en"):
     languages_allowed = ["en", "dk"]
     if lan not in languages_allowed: lan = "en"
     return render_template("forgot_password.html", old_values={}, lan=lan, languages=languages), 200
-
 
 ##############################
 # ***forgot password post***
@@ -1218,7 +1178,6 @@ def forgot_password(lan):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
 
 ##############################
 # ***verify get***
@@ -1354,7 +1313,6 @@ def reset_password(reset_key, lan="en"):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-
 ##############################
 # ***profile get***
 @app.get("/profile")
@@ -1404,8 +1362,6 @@ def profile(lan="en"):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
-
 
 ##############################
 # ***profile edit get***
@@ -1472,7 +1428,6 @@ def update_profile(lan):
             <mixhtml mix-function="resetButtonText">{getattr(languages, f"{lan}_edit_profile_button_default")}</mixhtml>
             """, 400
 
-        # Update DB
         db, cursor = x.db()
         cursor.execute("""
             UPDATE users
@@ -1536,9 +1491,6 @@ def delete_profile(lan="en"):
 
 ##############################
 # ***profile delete***
-# Mabye this route should use delete instead of post
-# But html forms arent supported with delete
-# and with post the users password can be send and validated
 @app.post("/profile/delete/<lan>")
 def confirm_delete_profile(lan):
     try:
@@ -1587,8 +1539,6 @@ def confirm_delete_profile(lan):
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-
-
 
 ##############################
 # ***search get***

@@ -1,4 +1,4 @@
-/* === RESET & BASE === */
+/* RESET & BASE */
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +12,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* overflow-x: hidden; */
+  
   background-color: #f9f9f9;
   color: #333;
 }
@@ -29,7 +29,7 @@ h2 {
   padding-bottom: 0.3rem;
 }
 
-/* === PAGE WRAPPERS === */
+/*PAGE WRAPPERS */
 #edit-profile,
 #delete-profile,
 #edit-item,
@@ -78,7 +78,7 @@ h2 {
   flex: 1;
 }
 
-/* === BUTTONS === */
+/*  BUTTONS */
 button.block {
   background-color: #fce3e3;
   border: 1px solid #e57373;
@@ -89,7 +89,7 @@ button.block:hover {
   background-color: #f8d7d7;
 }
 
-/* === UTILS === */
+/* UTILS */
 .ml {
   margin-left: auto;
 }
@@ -99,7 +99,7 @@ button.block:hover {
   display: none !important;
 }
 
-/* === LOADING BAR === */
+/* LOADING BAR*/
 #mix-cover {
   position: fixed;
   top: 0;
@@ -110,7 +110,7 @@ button.block:hover {
   z-index: 20;
 }
 
-/* === FEEDBACK MESSAGES === */
+/*FEEDBACK MESSAGES */
 .alert {
   padding: 1rem;
   border-radius: 6px;
@@ -149,7 +149,7 @@ button.block:hover {
   to { opacity: 0; }
 }
 
-/* === INDEX-SPECIFIC === */
+/* INDEX */
 main#index {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; /* tre lige brede kolonner */
@@ -211,7 +211,7 @@ main#index .custom-marker {
   font-weight: bold;
 }
 
-/* === ITEM MINI CARD === */
+/* ITEM MINI  */
 .item {
   background-color: #fff;
   border-radius: 10px;
@@ -241,7 +241,7 @@ main#index .custom-marker {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* === ITEM FULL DETAILS === */
+/* ITEM FULL DETAILS */
 #item {
   display: flex;
   flex-direction: column;
@@ -336,7 +336,7 @@ footer{
     margin-top: 1rem;
 }
 
-/* === MEDIA QUERIES === */
+/* MEDIA QUERIES */
 @media (max-width: 1200px) {
   main#index {
   display: grid;
