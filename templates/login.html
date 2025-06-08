@@ -5,9 +5,11 @@
 
   <h1>{{ languages[lan~'_dry_login'] }}</h1>
 
-  {% if message %}
-    <div class="alert success" mix-ttl="3000">{{ message }}</div>
-  {% endif %}
+{% if message %}
+  <div class="alert {{ message_type }}">
+    {{ message }}
+  </div>
+{% endif %}
 
   <form mix-post="/login/{{ lan }}" method="post">
     <input 

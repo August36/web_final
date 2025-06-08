@@ -113,6 +113,9 @@ dk_signup_success = "Tak for din tilmelding. Bekræft venligst din email, før d
 en_verify_success = "Your email is now verified. You can log in."
 dk_verify_success = "Din email er nu bekræftet. Du kan logge ind."
 
+en_verify_invalid = "The verification link is no longer valid."
+dk_verify_invalid = "Verifikationslinket er ikke længere gyldigt."
+
 en_reset_success = "Password updated. You can now log in."
 dk_reset_success = "Adgangskode opdateret. Du kan nu logge ind."
 
@@ -142,8 +145,11 @@ dk_signup_username_title = "Brugernavn skal være mellem 2 og 20 tegn, kun bogst
 en_signup_firstname_title = "First name must be between 2 and 20 characters, letters only"
 dk_signup_firstname_title = "Fornavn skal være mellem 2 og 20 tegn, kun bogstaver"
 
-en_signup_lastname_title = "Last name must be between 2 and 20 characters, letters only"
-dk_signup_lastname_title = "Efternavn skal være mellem 2 og 20 tegn, kun bogstaver"
+en_signup_first_name_title = "First name must be 2-20 letters. No numbers or special characters."
+dk_signup_first_name_title = "Fornavn skal være 2-20 bogstaver. Ingen tal eller specialtegn."
+
+en_signup_last_name_title = "Last name must be between 2 and 20 characters, letters only"
+dk_signup_last_name_title = "Efternavn skal være mellem 2 og 20 tegn, kun bogstaver"
 
 en_signup_email_title = "Enter a valid email (e.g. test@example.com)"
 dk_signup_email_title = "Indtast en gyldig email (f.eks. test@eksempel.dk)"

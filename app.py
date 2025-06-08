@@ -588,19 +588,168 @@ def show_signup(lan="en"):
 
 ##############################
 # ***signup post***
+# @app.post("/signup/<lan>")
+# def signup(lan):
+#     try:
+#         languages_allowed = ["en", "dk"]
+#         if lan not in languages_allowed: lan = "en"
+
+#         user_username  = x.validate_user_username()
+#         user_name      = x.validate_user_name()
+#         user_last_name = x.validate_user_last_name()
+#         user_email     = x.validate_user_email()
+#         user_password  = x.validate_user_password()
+
+#         hashed_password = generate_password_hash(user_password)
+#         user_created_at = int(time.time())
+#         verification_key = str(uuid.uuid4())
+
+#         q = """
+#         INSERT INTO users 
+#         (user_pk, user_username, user_name, user_last_name, user_email, 
+#          user_password, user_created_at, user_updated_at, user_deleted_at,
+#          user_verified, user_verification_key) 
+#         VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#         """
+#         db, cursor = x.db()
+#         cursor.execute(q, (
+#             user_username, user_name, user_last_name,
+#             user_email, hashed_password,
+#             user_created_at, 0, 0, 0, verification_key
+#         ))
+
+#         if cursor.rowcount != 1:
+#             raise Exception("System under maintenance")
+
+#         db.commit()
+#         x.send_email(user_name, user_last_name, user_email, verification_key)
+
+#         return f"""
+#         <mixhtml mix-redirect='/login/{lan}?message={getattr(languages, f"{lan}_signup_success")}'></mixhtml>
+#         """, 200
+
+#     except Exception as ex:
+#         ic(ex)
+#         if "db" in locals(): db.rollback()
+
+#         if "username" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_username_invalid")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         if "first name" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_first_name_invalid")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         if "last name" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_last_name_invalid")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         if "Invalid email" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_email_invalid")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         if "password" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_password_invalid")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         if "user_email" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_email_exists")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         if "user_username" in str(ex):
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               <div class='alert error'>{getattr(languages, f"{lan}_signup_username_exists")}</div>
+#             </mixhtml>
+#             """, 400
+
+#         return f"""
+#         <mixhtml mix-update=".form-feedback">
+#           <div class='alert error'>{getattr(languages, f"{lan}_signup_unknown_error").replace("{str(ex)}", str(ex))}</div>
+#         </mixhtml>
+#         """, 400
+
+#     finally:
+#         if "cursor" in locals(): cursor.close()
+#         if "db" in locals(): db.close()
+
+
+# ***signup post***
+#***FORBEDRET TIL MUNDTLIG EKSAMEN***
+#For at gøre min kode mere konsistent, forbedre jeg valideringen i denne route
+#Jeg bruger et for loop og tuple unpacking i stedet for at validere manuelt én ad gangen
+#Det gør min kode mere DRY, jeg undgår at skrive det samme valideringsmønster igen og igen ved at bruge et loop der reducerer fejl og gør koden lettere at opdatere senere.
+# Med for loopet opbygges form_errors automatisk, jeg behøver ikke omslutte alting med validate()-kald, da det sker i loopet.
+#Den forbedrede version sikre også i mod at en fejl stopper hele funktionen, og at en bruger kun får en fejl ad gangen.
+#Ens struktur i alle routes gør koden lettere at læse og vedligeholde
+#Det gør det nemmere at tilføje nye felter uden at ændre ret meget
+#Desuden har jeg også forbedret name feedback - før sagde den bare invalid input, nu forklarer den hvad problemet er, og vises både på dansk og engelsk.
+    #Jeg manglede variabler og oversættelser i language.py, der tog sig af dette. Ved at tilføje dem virker det nu.
 @app.post("/signup/<lan>")
 def signup(lan):
     try:
         languages_allowed = ["en", "dk"]
         if lan not in languages_allowed: lan = "en"
 
-        user_username  = x.validate_user_username()
-        user_name      = x.validate_user_name()
-        user_last_name = x.validate_user_last_name()
-        user_email     = x.validate_user_email()
-        user_password  = x.validate_user_password()
+        # Vi opretter en liste af tuples. Hver tuple består af:
+        # - navnet på et inputfelt i HTML'en (name="...")
+        # - referencen til den valideringsfunktion i x.py, som skal bruges
+        validators = [
+            ("user_username",   x.validate_user_username),
+            ("user_name",       x.validate_user_name),
+            ("user_last_name",  x.validate_user_last_name),
+            ("user_email",      x.validate_user_email),
+            ("user_password",   x.validate_user_password),
+        ]
 
-        hashed_password = generate_password_hash(user_password)
+        # Vi opretter to tomme dictionaries:
+        # - values gemmer de validerede inputværdier
+        # - form_errors gemmer fejlbeskeder for de input der fejler
+        values, form_errors = {}, {}
+
+        # Vi looper igennem hver tuple i validators-listen.
+        # Ved hjælp af tuple unpacking kalder vi fn (valideringsfunktionen)
+        # og gemmer resultatet i values under det korrekte inputnavn.
+        # Valideringsfunktionen henter selv værdien fra formularen via
+            # request.form.get("fieldname", "").strip() – det sker direkte inde i x.py.
+        # Hvis valideringen fejler, gemmer vi fejlbeskeden i form_errors.
+        for field, fn in validators:
+            try:
+                values[field] = fn()
+            except Exception as ex:
+                form_errors[field] = str(ex)
+
+        if form_errors:
+            error_html = (
+                "<ul class='alert error'>"
+                + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+                + "</ul>"
+            )
+            return f"""
+            <mixhtml mix-update=".form-feedback">
+              {error_html}
+            </mixhtml>
+            """, 400
+
+        hashed_password = generate_password_hash(values["user_password"])
         user_created_at = int(time.time())
         verification_key = str(uuid.uuid4())
 
@@ -611,10 +760,14 @@ def signup(lan):
          user_verified, user_verification_key) 
         VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
+
         db, cursor = x.db()
         cursor.execute(q, (
-            user_username, user_name, user_last_name,
-            user_email, hashed_password,
+            values["user_username"],
+            values["user_name"],
+            values["user_last_name"],
+            values["user_email"],
+            hashed_password,
             user_created_at, 0, 0, 0, verification_key
         ))
 
@@ -622,7 +775,12 @@ def signup(lan):
             raise Exception("System under maintenance")
 
         db.commit()
-        x.send_email(user_name, user_last_name, user_email, verification_key)
+        x.send_email(
+            values["user_name"],
+            values["user_last_name"],
+            values["user_email"],
+            verification_key
+        )
 
         return f"""
         <mixhtml mix-redirect='/login/{lan}?message={getattr(languages, f"{lan}_signup_success")}'></mixhtml>
@@ -632,58 +790,16 @@ def signup(lan):
         ic(ex)
         if "db" in locals(): db.rollback()
 
-        if "username" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_username_invalid")}</div>
-            </mixhtml>
-            """, 400
-
-        if "first name" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_first_name_invalid")}</div>
-            </mixhtml>
-            """, 400
-
-        if "last name" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_last_name_invalid")}</div>
-            </mixhtml>
-            """, 400
-
-        if "Invalid email" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_email_invalid")}</div>
-            </mixhtml>
-            """, 400
-
-        if "password" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_password_invalid")}</div>
-            </mixhtml>
-            """, 400
-
         if "user_email" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_email_exists")}</div>
-            </mixhtml>
-            """, 400
-
-        if "user_username" in str(ex):
-            return f"""
-            <mixhtml mix-update=".form-feedback">
-              <div class='alert error'>{getattr(languages, f"{lan}_signup_username_exists")}</div>
-            </mixhtml>
-            """, 400
+            message = getattr(languages, f"{lan}_signup_email_exists")
+        elif "user_username" in str(ex):
+            message = getattr(languages, f"{lan}_signup_username_exists")
+        else:
+            message = getattr(languages, f"{lan}_signup_unknown_error").replace("{str(ex)}", str(ex))
 
         return f"""
         <mixhtml mix-update=".form-feedback">
-          <div class='alert error'>{getattr(languages, f"{lan}_signup_unknown_error").replace("{str(ex)}", str(ex))}</div>
+          <div class='alert error'>{message}</div>
         </mixhtml>
         """, 400
 
@@ -1182,21 +1298,29 @@ def forgot_password(lan):
 ##############################
 # ***verify get***
 @app.get("/verify/<verification_key>")
-def verify_user(verification_key):
+@app.get("/verify/<verification_key>/<lan>")
+def verify_user(verification_key, lan="en"):
     try:
-        verification_key = x.validate_verification_key(verification_key)
+        if lan not in ["en", "dk"]:
+            lan = "en"
 
+        verification_key = x.validate_verification_key(verification_key)
         db, cursor = x.db()
 
-        # Tjek om en bruger med denne nøgle findes og ikke allerede er verificeret
         q = "SELECT * FROM users WHERE user_verification_key = %s AND user_verified = 0"
         cursor.execute(q, (verification_key,))
         user = cursor.fetchone()
 
         if not user:
-            return "Verification key is invalid or already in use", 400
+            message = getattr(languages, f"{lan}_verify_invalid")
+            return render_template(
+                "login.html",
+                message=message,
+                message_type="error",
+                lan=lan,
+                languages=languages
+            ), 400
 
-        # Opdater brugeren til at være verificeret og slet nøglen
         q = """
         UPDATE users
         SET user_verified = 1,
@@ -1206,7 +1330,14 @@ def verify_user(verification_key):
         cursor.execute(q, (verification_key,))
         db.commit()
 
-        return render_template("login.html", message="Your email is now verified. You can log in."), 200
+        message = getattr(languages, f"{lan}_verify_success")
+        return render_template(
+            "login.html",
+            message=message,
+            message_type="success",
+            lan=lan,
+            languages=languages
+        ), 200
 
     except Exception as ex:
         return str(ex), 500
@@ -1584,6 +1715,9 @@ def search():
         search_for = request.args.get("q", "").strip()
         search_for = x.validate_search_query(search_for)
 
+        # Tilføj wildcard (*) og skift til BOOLEAN MODE
+        boolean_search = f"{search_for}*"
+
         db, cursor = x.db()
         q = """
         SELECT items.*, (
@@ -1595,10 +1729,10 @@ def search():
         ) AS item_image
         FROM items
         WHERE item_blocked_at = 0
-        AND MATCH(item_name, item_description, item_address)
-            AGAINST (%s IN NATURAL LANGUAGE MODE)
+        AND MATCH(item_name)
+            AGAINST (%s IN BOOLEAN MODE)
         """
-        cursor.execute(q, (search_for,))
+        cursor.execute(q, (boolean_search,))
         rows = cursor.fetchall()
         return jsonify(rows), 200
 
@@ -1609,3 +1743,18 @@ def search():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+        #FORSTÅ OG OMSKRIV
+        # Vi bruger nu FULLTEXT-søgning med BOOLEAN MODE i stedet for NATURAL LANGUAGE MODE.
+        # Forklaring på forskellen:
+        # - NATURAL LANGUAGE MODE: Matcher kun hele ord og ignorerer kortere ord (typisk < 4 karakterer).
+        #   Det betyder, at søgning på 'engh' ikke matcher 'Enghave', da 'engh' ikke er et komplet ord.
+        # - BOOLEAN MODE: Tillader brug af specialtegn som '*' (wildcard), så vi kan finde ord, der starter med noget.
+        #   F.eks. 'engh*' matcher både 'Enghave', 'Enghøj' osv.
+
+        # Derudover gælder for begge modes:
+        # - FULLTEXT-søgning i MySQL virker som standard kun på ord med mindst 4 tegn,
+        #   medmindre man ændrer databasekonfigurationen (ft_min_word_len).
+
+        # Ved at tilføje '*' og bruge BOOLEAN MODE kan vi nu matche på delvise ord, hvilket gør "instant search" muligt.
+        # Eksempel: bruger skriver 't', søgning bliver 't*' og matcher f.eks. 'Tivoli' og 'The Little Mermaid'
+
