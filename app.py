@@ -223,6 +223,198 @@ def get_items_by_page(page_number, lan="en"):
 
 ##############################
 # ***item post***
+# @app.post("/item/<lan>")
+# def post_item(lan):
+#     try:
+#         languages_allowed = ["en", "dk"]
+#         if lan not in languages_allowed: lan = "en"
+
+#         user = x.validate_user_logged()
+
+#         validators = [
+#             ("item_name",        x.validate_item_name),
+#             ("item_description", x.validate_item_description),
+#             ("item_price",       x.validate_item_price),
+#             ("item_lat",         x.validate_item_lat),
+#             ("item_lon",         x.validate_item_lon),
+#             ("item_address",     x.validate_item_address),
+#             ("files",            x.validate_item_images),
+#         ]
+
+#         values, form_errors = {}, {}
+#         for field, fn in validators:
+#             try:
+#                 values[field] = fn()
+#             except Exception as ex:
+#                 form_errors[field] = str(ex)
+
+#         if form_errors:
+#             error_html = (
+#                 "<ul class='alert error'>"
+#                 + "".join(f"<li>{msg}</li>" for msg in form_errors.values())
+#                 + "</ul>"
+#             )
+#             return f"""
+#             <mixhtml mix-update=".form-feedback">
+#               {error_html}
+#             </mixhtml>
+#             <mixhtml mix-function="resetButtonText">
+#               {getattr(languages, f"{lan}_upload_item_button_default")}
+#             </mixhtml>
+#             """, 400
+
+#         db, cursor = x.db()
+#         item_created_at = int(time.time())
+
+#         cursor.execute(
+#             """
+#             INSERT INTO items (
+#                 item_name, item_description, item_price,
+#                 item_lat, item_lon, item_address,
+#                 item_user_fk, item_created_at, item_updated_at
+#             ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+#             """,
+#             (
+#                 values["item_name"],
+#                 values["item_description"],
+#                 values["item_price"],
+#                 values["item_lat"],
+#                 values["item_lon"],
+#                 values["item_address"],
+#                 user["user_pk"],
+#                 item_created_at,
+#                 0,
+#             ),
+#         )
+#         item_pk = cursor.lastrowid
+
+#         images, value_rows = [], []
+#         for image_name in values["files"]:
+#             image_pk = uuid.uuid4().hex
+#             images.append({"image_pk": image_pk, "image_name": image_name})
+#             value_rows.append(
+#                 f"('{image_pk}', '{user['user_pk']}', '{item_pk}', '{image_name}')"
+#             )
+
+#         if value_rows:
+#             cursor.execute(
+#                 f"""
+#                 INSERT INTO images (
+#                     image_pk, image_user_fk, image_item_fk, image_name
+#                 ) VALUES {','.join(value_rows)}
+#                 """
+#             )
+
+#         db.commit()
+
+#         item_html = f"""
+#         <div class="item-card" id="x{item_pk}">
+#             <h3>{values['item_name']}</h3>
+#             <p><strong>{getattr(languages, f"{lan}_dry_price")}</strong> {values['item_price']} DKK</p>
+#             <p><strong>{getattr(languages, f"{lan}_dry_address")}</strong> {values['item_address']}</p>
+#             <p>{values['item_description']}</p>
+
+#             <a href="/items/{item_pk}/edit/{lan}">{getattr(languages, f"{lan}_profile_edit_spot")}</a>
+#             <button mix-delete="/items/{item_pk}/{lan}">{getattr(languages, f"{lan}_profile_delete_item_btn")} {values['item_name']}</button>
+
+#             <div class="item-images">
+#         """
+#         for img in images:
+#             item_html += f"""
+#                 <div id="x{img['image_pk']}">
+#                     <img class="uploaded_imgs_profile"
+#                          src="/static/uploads/{img['image_name']}"
+#                          alt="{img['image_name']}">
+#                 </div>
+#             """
+#         item_html += "</div></div>"
+
+#         blank_form_html = render_template(
+#             "upload_item_form.html",
+#             form=None,
+#             errors=None,
+#             lan=lan,
+#             languages=languages
+#         )
+
+#         return f"""
+#         <mixhtml mix-after="#item-form">
+#           <div class='alert success' mix-ttl="3000">
+#             {getattr(languages, f"{lan}_upload_item_success")}
+#           </div>
+#         </mixhtml>
+
+#         <mixhtml mix-update="#item-form">
+#           {blank_form_html}
+#         </mixhtml>
+
+#         <mixhtml mix-after="#items-h2">
+#           {item_html}
+#         </mixhtml>
+#         """, 200
+
+#     except Exception as ex:
+#         ic(ex)
+#         return f"""
+#         <mixhtml mix-update=".form-feedback">
+#           <div class='alert error'>{getattr(languages, f"{lan}_upload_item_error").replace("{str(ex)}", str(ex))}</div>
+#         </mixhtml>
+#         <mixhtml mix-function="resetButtonText">
+#           {getattr(languages, f"{lan}_upload_item_button_default")}
+#         </mixhtml>
+#         """, 500
+
+#     finally:
+#         if "cursor" in locals(): cursor.close()
+#         if "db" in locals(): db.close()
+
+
+##############################
+#***FORBEDRET TIL MUNDTLIG EKSAMEN***
+# --- SIKKERHED OG SQL-INJEKTION VED INSERT AF BILLEDER ---
+
+# I min tidligere løsning blev billeddata indsat i databasen ved at opbygge en SQL-streng manuelt:
+# Jeg brugte .join() til at sammenkæde værdier som denne:
+#
+#   value_rows.append(f"('{image_pk}', '{user_pk}', '{item_pk}', '{image_name}')")
+#   ...
+#   cursor.execute("INSERT INTO images (...) VALUES " + ','.join(value_rows))
+#
+# Dette virker, men er ikke sikkert, fordi brugerinput (her: image_name) teknisk set bliver flettet direkte
+# ind i SQL-strengen. Det betyder, at hvis et felt indeholder ondsindet SQL (fx "'); DROP TABLE users; --"),
+# kunne det potentielt udføres som en del af kommandoen. Dette kaldes en SQL-injektion.
+
+# I min billedvalidering bruger jeg dog en vigtig sikkerhedsforanstaltning:
+# Jeg gemmer aldrig det oprindelige filnavn fra brugeren i databasen.
+# I stedet genererer jeg et nyt unikt filnavn ved at kombinere et UUID med filens tilladte extension:
+#
+#   new_file_name = f"{uuid.uuid4().hex}.{file_extension}"
+#
+# Det betyder, at selv hvis en bruger uploader en fil med skadeligt navn, bliver det ikke brugt.
+# Kun den sikre og kontrollerede UUID-baserede filnavn gemmes. Dermed reduceres risikoen betydeligt.
+
+# MEN: Selvom inputtet er sikkert i praksis, er det stadig dårlig praksis at bygge SQL-strenge manuelt.
+# Hvis jeg i fremtiden ændrer valideringsfunktionen og fx genbruger dele af det originale filnavn,
+# risikerer jeg at introducere en sårbarhed uden at opdage det.
+
+# Derfor har jeg ændret koden til at bruge cursor.executemany(), som er en sikker og anbefalet metode.
+# Med executemany() bruger jeg en parameteriseret SQL-query med %s som pladsholdere, og indsætter data som tuples:
+#
+#   image_values = [
+#       (image_pk, user_pk, item_pk, image_name),
+#       ...
+#   ]
+#   cursor.executemany("INSERT INTO images (...) VALUES (%s, %s, %s, %s)", image_values)
+#
+# Fordele ved denne metode:
+# - Adskiller data fra SQL-kode
+# - Beskytter automatisk mod SQL-injektion
+# - Gør det lettere at vedligeholde og fremtidssikre koden
+
+# Samlet konklusion:
+# Selvom validering af input gør løsningen robust, er den kun rigtig sikker, hvis man aldrig manuelt indsætter data
+# i SQL-strenge. Ved at skifte til executemany() opnår jeg en løsning, der er både sikker, korrekt og best practice.
+# ***item post***
 @app.post("/item/<lan>")
 def post_item(lan):
     try:
@@ -288,21 +480,26 @@ def post_item(lan):
         )
         item_pk = cursor.lastrowid
 
-        images, value_rows = [], []
+        #***FORBEDRET TIL MUNDTLIG EKSAMEN***
+        # Her genererer vi billeddata og opbygger en liste af tuples, som vi sender til executemany
+        images = []
+        images_to_insert = []
+
         for image_name in values["files"]:
             image_pk = uuid.uuid4().hex
             images.append({"image_pk": image_pk, "image_name": image_name})
-            value_rows.append(
-                f"('{image_pk}', '{user['user_pk']}', '{item_pk}', '{image_name}')"
+            images_to_insert.append(
+                (image_pk, user["user_pk"], item_pk, image_name)
             )
 
-        if value_rows:
-            cursor.execute(
-                f"""
+        if images_to_insert:
+            cursor.executemany(
+                """
                 INSERT INTO images (
                     image_pk, image_user_fk, image_item_fk, image_name
-                ) VALUES {','.join(value_rows)}
-                """
+                ) VALUES (%s, %s, %s, %s)
+                """,
+                images_to_insert
             )
 
         db.commit()

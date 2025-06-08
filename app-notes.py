@@ -396,7 +396,7 @@ def post_item(lan):
                     image_pk, image_user_fk, image_item_fk, image_name
                 ) VALUES 
                     {','.join(value_rows)}
-                # Vi indsætter alle billeder i ét kald – såkaldt bulk insert.
+                # Vi indsætter alle billeder i ét kald – et bulk insert.
                 # {','.join(value_rows)} samler alle værdierne i value_rows-listen og adskiller dem med komma.
                 # Det kan f.eks. ende som:
                 # ('abc123', 'user1', 'item1', 'img1.jpg'),
