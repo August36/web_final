@@ -6,6 +6,7 @@
   <h1>{{ languages[lan~'_dry_login'] }}</h1>
 
 {% if message %}
+  {% set message_type = message_type or 'error' %}
   <div class="alert {{ message_type }}">
     {{ message }}
   </div>

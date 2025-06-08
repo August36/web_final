@@ -14,27 +14,34 @@
           <p><strong>{{ languages[lan~'_admin_admin'] }}</strong> {{ languages[lan~'_admin_yes'] if user.user_is_admin else languages[lan~'_admin_no'] }}</p>
           <p><strong>{{ languages[lan~'_admin_blocked'] }}</strong> {{ languages[lan~'_admin_yes'] if user.user_blocked_at != 0 else languages[lan~'_admin_no'] }}</p>
 
-          <div id="user-actions-{{ user.user_pk }}">
-            {% if user.user_blocked_at == 0 %}
-              <form mix-patch="/admin/block-user">
-                <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
-                <button class="btn block"
-                        mix-await="{{ languages[lan~'_admin_block_button_await'] }}"
-                        mix-default="{{ languages[lan~'_admin_block_button_default'] }}">
-                  {{ languages[lan~'_admin_block_button_default'] }} {{ user.user_email }}
-                </button>
-              </form>
-            {% else %}
-              <form mix-patch="/admin/unblock-user">
-                <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
-                <button class="btn unblock"
-                        mix-await="{{ languages[lan~'_admin_unblock_button_await'] }}"
-                        mix-default="{{ languages[lan~'_admin_unblock_button_default'] }}">
-                  {{ languages[lan~'_admin_unblock_button_default'] }} {{ user.user_email }}
-                </button>
-              </form>
-            {% endif %}
-          </div>
+      <!-- ***FORBEDRET TIL MUNDTLIG EKSAMEN*** -->
+      <!-- Forhindrer at admin ser block/unblock-knap på sit eget user card -->
+      <!-- current_user_pk (fra session) sendes med fra admin-routen -->
+      <!-- Knappen vises kun for andre brugere, hvor user_pk ikke matcher current_user_pk -->
+          {% if user.user_pk != current_user_pk %}
+            <div id="user-actions-{{ user.user_pk }}">
+              {% if user.user_blocked_at == 0 %}
+                <form mix-patch="/admin/block-user">
+                  <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
+                  <button class="btn block"
+                          mix-await="{{ languages[lan~'_admin_block_button_await'] }}"
+                          mix-default="{{ languages[lan~'_admin_block_button_default'] }}">
+                    {{ languages[lan~'_admin_block_button_default'] }} {{ user.user_email }}
+                  </button>
+                </form>
+              {% else %}
+                <form mix-patch="/admin/unblock-user">
+                  <input type="hidden" name="user_pk" value="{{ user.user_pk }}" mix-check="^\d+$" title="Invalid user ID">
+                  <button class="btn unblock"
+                          mix-await="{{ languages[lan~'_admin_unblock_button_await'] }}"
+                          mix-default="{{ languages[lan~'_admin_unblock_button_default'] }}">
+                    {{ languages[lan~'_admin_unblock_button_default'] }} {{ user.user_email }}
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
+          
         </div>
       {% endfor %}
     </div>

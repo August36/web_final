@@ -783,7 +783,7 @@ def signup(lan):
         )
 
         return f"""
-        <mixhtml mix-redirect='/login/{lan}?message={getattr(languages, f"{lan}_signup_success")}'></mixhtml>
+        <mixhtml mix-redirect='/login/{lan}?message={getattr(languages, f"{lan}_signup_success")}&message_type=success'></mixhtml>
         """, 200
 
     except Exception as ex:
@@ -820,11 +820,14 @@ def show_login(lan="en"):
     default_message = request.args.get("message", "")
     message = profile_deleted_msg if profile_deleted_msg else default_message
 
+    message_type = request.args.get("message_type", "error")
+
     return render_template(
         "login.html",
         title="Login",
         active_login=active_login,
         message=message,
+        message_type=message_type,
         lan=lan,
         languages=languages
     ), 200
@@ -899,6 +902,14 @@ def logout(lan="en"):
 
 ##############################
 # ***admin get***
+#***FORBEDRET TIL MUNDTLIG EKSAMEN***
+# Tidligere kunne en admin blokere sig selv og dermed blive låst ude af systemet.
+# For at forhindre dette sender jeg den loggede brugers user_pk med i render_template som current_user_pk.
+# I view_admin.html bruger jeg et if-statement til at sammenligne current_user_pk med hver bruger i listen.
+# Hvis user.user_pk == current_user_pk, vises block/unblock-knappen ikke.
+# Det betyder, at den loggede admin ikke ser knappen til at blokere eller ophæve blokering af sig selv.
+# Da kun admins har adgang til view_admin.html, er det tilstrækkeligt at skjule knappen på denne måde.
+
 @app.get("/admin")
 @app.get("/admin/<lan>")
 def view_admin(lan="en"):
@@ -928,7 +939,8 @@ def view_admin(lan="en"):
             users=users,
             items=items,
             lan=lan,
-            languages=languages
+            languages=languages,
+            current_user_pk=session["user"]["user_pk"]
         ), 200
 
     except Exception as ex:
@@ -1708,7 +1720,6 @@ def confirm_delete_profile(lan):
 #Jeg havde før aflevering af projektet ikke tilføjet fulltext search, men brukt LIKE.
 #For at bruge fulltext search, valgte jeg kolonnerne: item_name, item_description, item_address og tilføjede indeks "FULLTEXT"
 #Derefter opdaterede jeg min search route til at bruge MATCH(...) AGAINST(...) i mine queries
-
 @app.get("/search")
 def search():
     try:
