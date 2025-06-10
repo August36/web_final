@@ -69,6 +69,7 @@ def datetimeformat(value, format="%d.%m.%Y"):
 @app.get("/<lan>")
 def view_index(lan="en"):
     try:
+        #Henter data og ét billede til de to første items
         languages_allowed = ["en", "dk"]
         if lan not in languages_allowed: lan = "en"
         db, cursor = x.db()
@@ -88,6 +89,7 @@ def view_index(lan="en"):
         cursor.execute(q)
         items = cursor.fetchall()
 
+        #Henter alle billeder til det første item i items - angives med items[0] - dette item bliver renderet i højre column via _item.html.
         images = []
         if items:
             q_images = "SELECT * FROM images WHERE image_item_fk = %s"
@@ -1914,9 +1916,7 @@ def confirm_delete_profile(lan):
 
 # ***search get***
 #***FORBEDRET TIL MUNDTLIG EKSAMEN***
-#Jeg havde før aflevering af projektet ikke tilføjet fulltext search, men brukt LIKE.
-#For at bruge fulltext search, valgte jeg kolonnerne: item_name, item_description, item_address og tilføjede indeks "FULLTEXT"
-#Derefter opdaterede jeg min search route til at bruge MATCH(...) AGAINST(...) i mine queries
+#Jeg havde før aflevering af projektet ikke tilføjet fulltext search, men brugt LIKE.
 @app.get("/search")
 def search():
     try:
@@ -1951,7 +1951,6 @@ def search():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
-        #FORSTÅ OG OMSKRIV
         # Vi bruger nu FULLTEXT-søgning med BOOLEAN MODE i stedet for NATURAL LANGUAGE MODE.
         # Forklaring på forskellen:
         # - NATURAL LANGUAGE MODE: Matcher kun hele ord og ignorerer kortere ord (typisk < 4 karakterer).
