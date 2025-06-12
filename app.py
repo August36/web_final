@@ -14,6 +14,12 @@ from datetime import datetime
 from icecream import ic
 ic.configureOutput(prefix=f'!x!app.py!x! | ', includeContext=True)
 
+#SPØRGSMÅL JEG FIK TIL EKSAMEN - få styr på disse i løbet af sommerferien samt øv dig på andre spørgsmål:
+# - Få show more button til at vise 4 items i stedet for 2
+# - Byg ny test route som viser en variabel med dit navn - tror han ville have at navnet skulle medsendes i url'en, så variablen skulle trækkes ned der fra
+# - Lav en list og render den med et for loop i html'en.
+# - Hvad er cache og hvordan virker den funktion der fjerner cache under udvikling.
+
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
