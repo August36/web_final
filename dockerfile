@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kopiér resten af projektet ind
 COPY . .
 
-CMD flask run --host=0.0.0.0 --port=${PORT:-80}
+CMD sh -c 'echo "=== CONTAINER STARTED ===" && echo "PORT=$PORT" && echo "=== STARTING FLASK ===" && python -m flask run --host=0.0.0.0 --port=${PORT:-80}'
