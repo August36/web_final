@@ -69,6 +69,24 @@ def disable_cache(response):
 def datetimeformat(value, format="%d.%m.%Y"):
     return datetime.fromtimestamp(value).strftime(format)
 
+
+# Henter name fra url'en og viser i html. - spørgsmål fra eksamen
+# Laver også en list og viser via for loop i html - også spørgsmål fra eksamen
+# @app.get("/test/<lan>/<name>")
+# def show_test(name, lan="en"):
+#     try:
+#         my_list = ["a", "b", "c"]
+
+#         return render_template("test.html", name=name, my_list=my_list, lan=lan, languages=languages)
+
+#     except Exception as ex:
+#         ic(ex)
+#         return "ups", 400
+    
+#     finally:
+#         pass
+
+
 ##############################
 # ***index***
 @app.get("/")

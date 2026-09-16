@@ -21,10 +21,11 @@ password = os.getenv("EMAIL_PASSWORD")
 ##############################
 def db():
     db = mysql.connector.connect(
-        host = "mysql",      # Replace with your MySQL server's address or docker service name "mysql"
-        user = "root",  # Replace with your MySQL username
-        password = "password",  # Replace with your MySQL password
-        database = "company"   # Replace with your MySQL database name
+        host=os.getenv("MYSQLHOST", "mysql"),
+        port=int(os.getenv("MYSQLPORT", 3306)),
+        user=os.getenv("MYSQLUSER", "root"),
+        password=os.getenv("MYSQLPASSWORD", "password"),
+        database=os.getenv("MYSQLDATABASE", "company")
     )
     cursor = db.cursor(dictionary=True)
     return db, cursor
