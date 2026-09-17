@@ -1902,47 +1902,11 @@ def confirm_delete_profile(lan):
 
 ##############################
 # ***search get GAMMEL VERSION***
-# @app.get("/search")
-# def search():
-#     try:
-#         search_for = request.args.get("q", "").strip()
-#         search_for = x.validate_search_query(search_for)
-
-#         db, cursor = x.db()
-#         q = """
-#         SELECT items.*, (
-#             SELECT image_name
-#             FROM images
-#             WHERE images.image_item_fk = items.item_pk
-#             ORDER BY image_pk ASC
-#             LIMIT 1
-#         ) AS item_image
-#         FROM items
-#         WHERE item_blocked_at = 0 AND item_name LIKE %s
-#         """
-#         cursor.execute(q, (f"{search_for}%",))
-#         rows = cursor.fetchall()
-#         return jsonify(rows), 200
-
-#     except Exception as ex:
-#         ic(ex)
-#         return "x", 400
-
-#     finally:
-#         if "cursor" in locals(): cursor.close()
-#         if "db" in locals(): db.close()
-
-# ***search get***
-#***FORBEDRET TIL MUNDTLIG EKSAMEN***
-#Jeg havde før aflevering af projektet ikke tilføjet fulltext search, men brugt LIKE.
 @app.get("/search")
 def search():
     try:
         search_for = request.args.get("q", "").strip()
         search_for = x.validate_search_query(search_for)
-
-        # Tilføj wildcard (*) og skift til BOOLEAN MODE
-        boolean_search = f"{search_for}*"
 
         db, cursor = x.db()
         q = """
@@ -1954,11 +1918,9 @@ def search():
             LIMIT 1
         ) AS item_image
         FROM items
-        WHERE item_blocked_at = 0
-        AND MATCH(item_name)
-            AGAINST (%s IN BOOLEAN MODE)
+        WHERE item_blocked_at = 0 AND item_name LIKE %s
         """
-        cursor.execute(q, (boolean_search,))
+        cursor.execute(q, (f"{search_for}%",))
         rows = cursor.fetchall()
         return jsonify(rows), 200
 
@@ -1969,6 +1931,44 @@ def search():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+# ***search get***
+#***FORBEDRET TIL MUNDTLIG EKSAMEN***
+#Jeg havde før aflevering af projektet ikke tilføjet fulltext search, men brugt LIKE.
+# @app.get("/search")
+# def search():
+#     try:
+#         search_for = request.args.get("q", "").strip()
+#         search_for = x.validate_search_query(search_for)
+
+#         # Tilføj wildcard (*) og skift til BOOLEAN MODE
+#         boolean_search = f"{search_for}*"
+
+#         db, cursor = x.db()
+#         q = """
+#         SELECT items.*, (
+#             SELECT image_name
+#             FROM images
+#             WHERE images.image_item_fk = items.item_pk
+#             ORDER BY image_pk ASC
+#             LIMIT 1
+#         ) AS item_image
+#         FROM items
+#         WHERE item_blocked_at = 0
+#         AND MATCH(item_name)
+#             AGAINST (%s IN BOOLEAN MODE)
+#         """
+#         cursor.execute(q, (boolean_search,))
+#         rows = cursor.fetchall()
+#         return jsonify(rows), 200
+
+#     except Exception as ex:
+#         ic(ex)
+#         return "x", 400
+
+#     finally:
+#         if "cursor" in locals(): cursor.close()
+#         if "db" in locals(): db.close()
         # Vi bruger nu FULLTEXT-søgning med BOOLEAN MODE i stedet for NATURAL LANGUAGE MODE.
         # Forklaring på forskellen:
         # - NATURAL LANGUAGE MODE: Matcher kun hele ord og ignorerer kortere ord (typisk < 4 karakterer).
